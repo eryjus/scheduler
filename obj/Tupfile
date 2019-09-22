@@ -1,0 +1,38 @@
+#####################################################################################################################
+##
+##  Tupfile -- An alternative to 'make` build system -- build the object files for the kernel
+##
+##        Copyright (c)  2019 -- Adam Clark
+##
+## -----------------------------------------------------------------------------------------------------------------
+##
+##     Date      Tracker  Version  Pgmr  Description
+##  -----------  -------  -------  ----  ---------------------------------------------------------------------------
+##  2019-Sep-03  Initial   0.0.0   ADCL  Initial version
+##
+#####################################################################################################################
+
+
+##
+## -- include the current working directory
+##    -------------------------------------
+include ../Tuprules.tup
+
+
+##
+## -- Create the !macros
+##    ------------------
+!ar =       |> $(AR) crs %o %f                          |>
+!cc =       |> $(CC) $(CFLAGS) $(CCDEFINE) -o %o %f     |> %B.o
+!dump =     |> $(DUMP) -D %f > %o                       |> %B.map
+!as =       |> nasm $(NFLAGS) $(CCDEFINE)  -o %o %f     |> %B.o
+
+
+
+
+##
+## -- Some additional object files for this target
+##    --------------------------------------------
+: foreach  $(WS)/src/*.s                                    |> !as |>
+: foreach  $(WS)/src/*.cc                                   |> !cc |>
+

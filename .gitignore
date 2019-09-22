@@ -1,0 +1,9 @@
+.tup
+sysroot
+img
+
+bin/boot/*.elf
+obj/*.o
+
+bin/boot/grub/grub.cfg
+

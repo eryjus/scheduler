@@ -1,0 +1,86 @@
+#####################################################################################################################
+##
+##  Tuprules.tup -- These are the variables and macros needed to build century-os
+##
+##        Copyright (c)  2017-2019 -- Adam Clark
+##
+## -----------------------------------------------------------------------------------------------------------------
+##
+##     Date      Tracker  Version  Pgmr  Description
+##  -----------  -------  -------  ----  ---------------------------------------------------------------------------
+##  2018-Nov-15  Initial   0.2.0   ADCL  Initial version
+##
+#####################################################################################################################
+
+
+##
+## -- include the current working directory
+##    -------------------------------------
+include tuprules.inc
+
+
+##
+## -- These are the commands that will be used to build for that arm architecture
+##    ---------------------------------------------------------------------------
+AR = i686-elf-ar
+AS = nasm
+CC = i686-elf-gcc
+LD = i686-elf-ld
+OC = i686-elf-objcopy
+
+
+##
+## -- Build out the CFLAGS variable for g++
+##    -------------------------------------
+CFLAGS += -ffreestanding
+CFLAGS += -nostdlib
+CFLAGS += -fno-builtin
+CFLAGS += -nostartfiles
+CFLAGS += -fno-unwind-tables
+CFLAGS += -fno-exceptions
+CFLAGS += -O2
+CFLAGS += -g
+CFLAGS += -Werror
+CFLAGS += -Wall
+CFLAGS += -c
+CFLAGS += -I ../inc
+
+
+##
+## -- Build out the NFLAGS variable -- for nasm
+##    -----------------------------------------
+NFLAGS += -felf
+NFLAGS += -g
+NFLAGS += -w+all
+
+
+##
+## -- Build out the AFLAGS variable -- for gas
+##    ----------------------------------------
+AFLAGS += -march=armv7ve
+AFLAGS += -c
+
+
+##
+## -- Build out the LDFLAGS variable -- for ld (through g++)
+##    ------------------------------------------------------
+LDFLAGS += -z max-page-size=0x1000
+LDFLAGS += -nostdlib
+LDFLAGS += -g
+LDFLAGS += -O2
+
+
+##
+## -- Create the !macros
+##    ------------------
+!ar =       |> $(AR) crs %o %f                          |>
+!cc =       |> $(CC) $(CFLAGS) $(CCDEFINE) -o %o %f     |> %B.o
+!dump =     |> $(DUMP) -D %f > %o                       |> %B.map
+
+ifeq ($(ARCH),x86)
+!as =       |> nasm $(NFLAGS) $(CCDEFINE)  -o %o %f     |> %B.o
+else
+!as =       |> $(AS) $(AFLAGS) $(ASDEFINE) -o %o %f     |> %B.o
+endif
+
+
