@@ -7,6 +7,7 @@
 //     Date      Tracker  Version  Pgmr  Description
 //  -----------  -------  -------  ----  --------------------------------------------------------------------------
 //  2019-Sep-21  Initial   0.0.0   ADCL  Initial version
+//  2019-Sep-24  Pull#1   step01   ADCL  Correct an issue with the buffer overrunning
 //
 //===================================================================================================================
 
@@ -40,10 +41,10 @@ void VideoInit(void)
 //    ------------------------------
 void WriteChar(int ch)
 {
-    if (row == 25) return;
+    if (row >= 25) return;
 
-newline:
     if (ch == '\n') {
+newline:
         row ++;
         col = 0;
         return;
