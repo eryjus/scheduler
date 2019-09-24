@@ -63,3 +63,17 @@ run-x86-pc: x86-pc
 	qemu-system-i386 -smp 4 -m 3584 -serial stdio -cdrom img/x86-pc.iso
 
 
+##
+## -- Run the x86-pc on bochs
+##    -----------------------
+.PHONY: bochs-x86-pc
+bochs-x86-pc: x86-pc
+	bochs-debugger -f .bochsrc -q
+
+
+##
+## -- Debug the x86-pc on qemu
+##    ------------------------
+.PHONY: debug-x86-pc
+debug-x86-pc: x86-pc
+	qemu-system-i386 -smp 4 -no-reboot -no-shutdown -m 3584 -serial mon:stdio -cdrom img/x86-pc.iso -S
