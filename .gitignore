@@ -4,6 +4,7 @@ img
 
 bin/boot/*.elf
 obj/*.o
+*.log
 
 bin/boot/grub/grub.cfg
 
