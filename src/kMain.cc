@@ -7,7 +7,8 @@
 //     Date      Tracker  Version  Pgmr  Description
 //  -----------  -------  -------  ----  --------------------------------------------------------------------------
 //  2019-Sep-21  Initial   0.0.0   ADCL  Initial version
-//  2019-Sep-23  Step 01  step01   ADCL  Complete Step 1 of the tutorial
+//  2019-Sep-23  Step 1   step01   ADCL  Complete Step 1 of the tutorial
+//  2019-Sep-25  Step 2   step02   ADCL  Add `Schedule()` and update the processes
 //
 //===================================================================================================================
 
@@ -22,34 +23,18 @@
 extern "C" void kMain(void);
 
 
-//
-// -- Some simple global variables
-//    ----------------------------
-PCB_t *A;
-PCB_t *B;
-PCB_t *C;
+char pch = 'A';
 
 
 //
-// -- This is process "B" which wll output the letter "B"
-//    ---------------------------------------------------
-void ProcessB(void)
+// -- This is a generic process which will output a letter accordingly
+//    ----------------------------------------------------------------
+void Process(void)
 {
+    char ch = pch ++;
     while (true) {
-        WriteChar('B');
-        SwitchToTask(C);
-    }
-}
-
-
-//
-// -- This is process "C" which wll output the letter "C"
-//    ---------------------------------------------------
-void ProcessC(void)
-{
-    while (true) {
-        WriteChar('C');
-        SwitchToTask(A);
+        WriteChar(ch);
+        Schedule();
     }
 }
 
@@ -62,14 +47,23 @@ void kMain(void)
     VideoInit();
     WriteStr("Welcome\n");
     InitScheduler();
-    A = currentPCB;
 
-    B = CreateProcess(ProcessB);
-    C = CreateProcess(ProcessC);
+    // -- each will not get their "letter" until they start running
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
+    CreateProcess(Process);
 
-    // -- loop forever rather than return
-    while(true) {
-        WriteChar('A');
-        SwitchToTask(B);
-    }
+    // -- Now, we call process ourselves
+    Process();
 }
