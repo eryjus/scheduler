@@ -7,6 +7,7 @@
 ;;     Date      Tracker  Version  Pgmr  Description
 ;;  -----------  -------  -------  ----  --------------------------------------------------------------------------
 ;;  2019-Sep-22  Initial   step01   ADCL  Initial version
+;;  2019-Sep-26  Step 01   step01   ADCL  Fix a stack symmetry issue
 ;;
 ;;===================================================================================================================
 
@@ -80,7 +81,7 @@ SwitchToTask:
         pop         ebp
         pop         edi
         pop         esi
-        pop         ebp
+        pop         ebx
 
         ret                                 ;; this is the next task's `eip`
 
