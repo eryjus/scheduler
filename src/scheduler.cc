@@ -7,6 +7,7 @@
 //     Date      Tracker  Version  Pgmr  Description
 //  -----------  -------  -------  ----  --------------------------------------------------------------------------
 //  2019-Sep-22  Initial  step01   ADCL  Initial version
+//  2019-Sep-25  Step 2   step02   ADCL  Add `Schedule()` and create a circular linked list   
 //
 //===================================================================================================================
 
@@ -42,7 +43,7 @@ void InitScheduler(void)
     pcbArray[0].tos = 0;
     pcbArray[0].virtAddr = GetCR3();
     pcbArray[0].state = 0;
-    pcbArray[0].next = (PCB_t *)0;
+    pcbArray[0].next = &pcbArray[0];
 
     currentPCB = &pcbArray[0];
 }
@@ -57,6 +58,7 @@ PCB_t *PcbAlloc(void)
         if (pcbArray[i].used == 0) {
             pcbArray[i].used = 1;
             pcbArray[i].tos = ((0x181 + i) << 12);  // also allocate a stack here
+
             return &pcbArray[i];
         }
     }
@@ -104,6 +106,21 @@ PCB_t *CreateProcess(void (*ent)())
     rv->tos = (unsigned int)tos;
     rv->virtAddr = GetCR3();
 
+    //
+    // -- this bit of code will add the new process right after the first thing we started with -- 
+    //    the kernel init; I like this better than fiddling with the `currentPcb` variable.
+    //    ----------------------------------------------------------------------------------------
+    rv->next = pcbArray[0].next;
+    pcbArray[0].next = rv;
+
     return rv;
 }
 
+
+//
+// -- based on what is currently running (roun-robin style), select the next task
+//    ---------------------------------------------------------------------------
+void Schedule(void) 
+{
+    SwitchToTask(currentPCB->next);
+}

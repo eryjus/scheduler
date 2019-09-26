@@ -80,7 +80,7 @@ SwitchToTask:
         pop         ebp
         pop         edi
         pop         esi
-        pop         ebp
+        pop         ebx
 
         ret                                 ;; this is the next task's `eip`
 

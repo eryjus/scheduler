@@ -109,7 +109,7 @@ More debugging....  I pick up with the second `SwitchToTask()` call which never 
 
 Well, crap!
 
-```
+```asm
 ;
 ;; -- get the current `cr3` value
 ;;    ---------------------------
@@ -208,3 +208,131 @@ And this is from the disassembled code:
 ```
 
 Well, I am overwriting the code with the video buffer.  This is supposed to not happen but it is.
+
+---
+
+### 2019-Sep-25
+
+## Branch `step02`
+
+Step 2 is a near trivial implementation of a `Schedule()` function and then some resulting cleanup that this new function enables.  This will entail:
+* Creating and maintaing a circular linked list, updating `InitScheduler()` and `CreateProcess()` -- and I want to note that I do then expect the processes to execute in reverse order from which they were created
+* Write a `Schedule()` function
+* Replace calls to `SwitchToTask()` with a call to `Schedule()` instead -- which will make `ProcessB()` and `ProcessC()` look nearly identical, with the only difference being the letter that is output; which can be set as a global variable.
+
+---
+
+Of course, for the first test, there is output `'A'` and the nothing but `'B'`s the rest of the screen.  I think I did something wrong and it's probably with the linked list.
+
+I also realize now that while the last process created will be next to be scheduled (which is flawed anyway), the way in which I implemented the letter assignmet will keep them all in order.
+
+---
+
+OK, so I have a theory here.  Currently, my optimization level is `-O2` when I compile.  When I comment that out or disable optimizations, I get single `ABC` output and the a triple fault.  And finally, when I go with `-O4` I get the same results as `-O2`.  So my theory is that the compiler is optimizing the C code in a manner that breaks `cdecl`.  
+
+Let me do a comparison of the assembly code that calls `SwitchToTask()`.  Recall that `SwitchToTask()` starts with the following code:
+
+```asm
+;;    * cdecl ensures that `eax`, `ecx`, and `edx` are saved on the stack
+;; <snip>
+SwitchToTask:
+        push        ebx
+        push        esi
+        push        edi
+        push        ebp
+```
+
+So, let's go verify that with `-O2`:
+
+```asm
+001002c0 <Schedule>:
+  1002c0:       83 ec 18                sub    $0x18,%esp
+  1002c3:       a1 00 2c 10 00          mov    0x102c00,%eax
+  1002c8:       ff 70 08                pushl  0x8(%eax)
+  1002cb:       e8 70 fd ff ff          call   100040 <SwitchToTask>
+```
+
+Well, this does not save anything.  But then again, `%eax` is only used and not required after the `call`.  So, now I need to go consider what calls `Schedule()`:
+
+```asm
+001000a0 <_Z7Processv>:
+  1000a0:       53                      push   %ebx
+  1000a1:       83 ec 08                sub    $0x8,%esp
+  1000a4:       0f be 1d d0 17 10 00    movsbl 0x1017d0,%ebx
+  1000ab:       8d 43 01                lea    0x1(%ebx),%eax
+  1000ae:       a2 d0 17 10 00          mov    %al,0x1017d0
+  1000b3:       8d b4 26 00 00 00 00    lea    0x0(%esi,%eiz,1),%esi
+  1000ba:       8d b6 00 00 00 00       lea    0x0(%esi),%esi
+  1000c0:       83 ec 0c                sub    $0xc,%esp
+  1000c3:       53                      push   %ebx
+  1000c4:       e8 37 02 00 00          call   100300 <WriteChar>
+  1000c9:       e8 f2 01 00 00          call   1002c0 <Schedule>
+  1000ce:       83 c4 10                add    $0x10,%esp
+  1000d1:       eb ed                   jmp    1000c0 <_Z7Processv+0x20>
+```
+
+In this case `%ebx` is loaded with a value that is required to persist after the call to `Schedule` and `WriteChar()` was implemented without touching `%ebx`.  Therefore, the kernel will create process B and then process C.  It will then call Process itself which assigns itself a character and outputs an `'A'` (which is stored in `%ebx`).  `Schedule()` is called.  Then process B gets control (actually the last one created but it has not been assigned a character yet) and assigns itself `'B'` (also stored in `%ebx`) and outputs that character.  `Schedule()` is called again.  Finally C gets control, assigns itself `'C'` in `%ebx` and outputs that character.  `Schedule()` is called again.  Now, A gets control again, but `%ebx` is not updated to reflect its assigned character; it outputs `'C'` again.
+
+Now, the same analysis with `-O0`:
+
+The call to `SwitchToTask()`:
+
+```asm
+001002f3 <Schedule>:
+  1002f3:       55                      push   %ebp
+  1002f4:       89 e5                   mov    %esp,%ebp
+  1002f6:       83 ec 08                sub    $0x8,%esp
+  1002f9:       a1 20 13 10 00          mov    0x101320,%eax
+  1002fe:       8b 40 08                mov    0x8(%eax),%eax
+  100301:       83 ec 0c                sub    $0xc,%esp
+  100304:       50                      push   %eax
+  100305:       e8 36 fd ff ff          call   100040 <SwitchToTask>
+```
+
+Again, `%ebx` is not set and `%eax` is not needed.  So, the call to `Schedule()`:
+
+```asm
+001000a0 <_Z7Processv>:
+  1000a0:       55                      push   %ebp
+  1000a1:       89 e5                   mov    %esp,%ebp
+  1000a3:       83 ec 18                sub    $0x18,%esp
+  1000a6:       0f b6 05 e4 12 10 00    movzbl 0x1012e4,%eax
+  1000ad:       89 c2                   mov    %eax,%edx
+  1000af:       83 c2 01                add    $0x1,%edx
+  1000b2:       88 15 e4 12 10 00       mov    %dl,0x1012e4
+  1000b8:       88 45 f7                mov    %al,-0x9(%ebp)
+  1000bb:       0f be 45 f7             movsbl -0x9(%ebp),%eax
+  1000bf:       83 ec 0c                sub    $0xc,%esp
+  1000c2:       50                      push   %eax
+  1000c3:       e8 6c 02 00 00          call   100334 <WriteChar>
+  1000c8:       83 c4 10                add    $0x10,%esp
+  1000cb:       e8 23 02 00 00          call   1002f3 <Schedule>
+  1000d0:       eb e9                   jmp    1000bb <_Z7Processv+0x1b>
+```
+
+This now stores the letter to print in `%eax`, which is clobbered by `Schedule()`.  However, this is actually stored on the stack properly so it should work -- I just need to figure out the triple fault to be able to prove it.
+
+---
+
+### 2019-Sep-26
+
+Well I did find a stack symmetry problem:
+
+```asm
+        push        ebx
+        push        esi
+        push        edi
+        push        ebp
+
+;; -- snip
+
+        pop         ebp
+        pop         edi
+        pop         esi
+        pop         ebp         ;; oops!
+```
+
+This, of course, cleans up my problems with `-O0` as well.
+
+And my theory was wrong -- which I should have known better!
+
