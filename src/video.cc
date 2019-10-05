@@ -8,6 +8,7 @@
 //  -----------  -------  -------  ----  --------------------------------------------------------------------------
 //  2019-Sep-21  Initial   0.0.0   ADCL  Initial version
 //  2019-Sep-24  Pull#1   step01   ADCL  Correct an issue with the buffer overrunning
+//  2019-Oct-05  Step 3   step03   ADCL  Add the `WriteDecimal()` function
 //
 //===================================================================================================================
 

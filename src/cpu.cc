@@ -78,3 +78,4 @@ unsigned long GetCurrentCounter(void)
 {
     return counter;
 }
+
