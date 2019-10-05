@@ -20,6 +20,7 @@ extern "C"
     void VideoInit(void);
     void WriteChar(int ch);
     void WriteStr(const char *s);
+    void WriteDecimal(const unsigned long val);
 }
 
 #endif

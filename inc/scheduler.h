@@ -53,6 +53,8 @@ extern "C"
     PCB_t *CreateProcess(void (*ent)());
 
     void Schedule(void);
+
+    void UpdateTimeUsed(void);
 }
 
 #endif

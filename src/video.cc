@@ -74,3 +74,26 @@ void WriteStr(const char *s)
     }
 }
 
+
+//
+// -- Worker function to write a decimal value
+//    ----------------------------------------
+static inline void WriteDec(unsigned long val)
+{
+    if (val == 0) return;
+    else {
+        WriteDec(val / 10);
+        WriteChar('0' + (val % 10));
+    }
+}
+
+
+//
+// -- Write a decimal value on the screen
+//    -----------------------------------
+void WriteDecimal(const unsigned long val)
+{
+    if (val == 0) WriteChar('0');
+    else WriteDec(val);
+}
+

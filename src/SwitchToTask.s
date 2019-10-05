@@ -23,6 +23,7 @@
 ;; -- thing that need to be see inside this source but are defined outside
 ;;    --------------------------------------------------------------------
         extern      currentPCB
+        extern      UpdateTimeUsed
 
 
 ;;
@@ -55,6 +56,8 @@ SwitchToTask:
         push        esi
         push        edi
         push        ebp
+
+        call        UpdateTimeUsed          ;; update the time used field before swapping
 
         mov         edi,[currentPCB]        ;; `edi` = previous tasks PCB
         mov         [edi+TOS],esp           ;; save the top of the stack

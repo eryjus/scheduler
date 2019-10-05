@@ -12,6 +12,7 @@
 //===================================================================================================================
 
 
+#include "cpu.h"
 #include "scheduler.h"
 
 
@@ -32,6 +33,13 @@ PCB_t *currentPCB;
 //    -------------------------------------------
 PCB_t pcbArray[MAX_TASKS];
 
+
+//
+// -- This is the last counter value read
+//    -----------------------------------
+unsigned long lastCounter;
+
+
 //
 // -- initialize the current task block
 //    ---------------------------------
@@ -46,6 +54,8 @@ void InitScheduler(void)
     pcbArray[0].next = &pcbArray[0];
 
     currentPCB = &pcbArray[0];
+
+    lastCounter = GetCurrentCounter();
 }
 
 
@@ -124,3 +134,16 @@ void Schedule(void)
 {
     SwitchToTask(currentPCB->next);
 }
+
+
+//
+// -- Update the current process with the amount of time used
+//    -------------------------------------------------------
+void UpdateTimeUsed(void)
+{
+    unsigned long c = lastCounter;
+    lastCounter = GetCurrentCounter();
+    currentPCB->used += (lastCounter - c);
+}
+
+
