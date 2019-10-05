@@ -8,6 +8,7 @@
 //  -----------  -------  -------  ----  --------------------------------------------------------------------------
 //  2019-Sep-21  Initial   0.0.0   ADCL  Initial version
 //  2019-Sep-24  Pull#1   step01   ADCL  Correct an issue with the buffer overrunning
+//  2019-Oct-05  Step 3   step03   ADCL  Add the `WriteDecimal()` function
 //
 //===================================================================================================================
 
@@ -72,5 +73,28 @@ void WriteStr(const char *s)
     while (*s) {
         WriteChar(*s ++);
     }
+}
+
+
+//
+// -- Worker function to write a decimal value
+//    ----------------------------------------
+static inline void WriteDec(unsigned long val)
+{
+    if (val == 0) return;
+    else {
+        WriteDec(val / 10);
+        WriteChar('0' + (val % 10));
+    }
+}
+
+
+//
+// -- Write a decimal value on the screen
+//    -----------------------------------
+void WriteDecimal(const unsigned long val)
+{
+    if (val == 0) WriteChar('0');
+    else WriteDec(val);
 }
 

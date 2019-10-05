@@ -7,11 +7,13 @@
 //     Date      Tracker  Version  Pgmr  Description
 //  -----------  -------  -------  ----  --------------------------------------------------------------------------
 //  2019-Sep-22  Initial  step01   ADCL  Initial version
-//  2019-Sep-25  Step 2   step02   ADCL  Add `Schedule()` and create a circular linked list   
+//  2019-Sep-25  Step 2   step02   ADCL  Add `Schedule()` and create a circular linked list
+//  2019-Oct-05  Step 3   step03   ADCL  Add timer-related functions to the scheduler
 //
 //===================================================================================================================
 
 
+#include "cpu.h"
 #include "scheduler.h"
 
 
@@ -32,6 +34,13 @@ PCB_t *currentPCB;
 //    -------------------------------------------
 PCB_t pcbArray[MAX_TASKS];
 
+
+//
+// -- This is the last counter value read
+//    -----------------------------------
+unsigned long lastCounter;
+
+
 //
 // -- initialize the current task block
 //    ---------------------------------
@@ -46,6 +55,8 @@ void InitScheduler(void)
     pcbArray[0].next = &pcbArray[0];
 
     currentPCB = &pcbArray[0];
+
+    lastCounter = GetCurrentCounter();
 }
 
 
@@ -124,3 +135,16 @@ void Schedule(void)
 {
     SwitchToTask(currentPCB->next);
 }
+
+
+//
+// -- Update the current process with the amount of time used
+//    -------------------------------------------------------
+void UpdateTimeUsed(void)
+{
+    unsigned long c = lastCounter;
+    lastCounter = GetCurrentCounter();
+    currentPCB->used += (lastCounter - c);
+}
+
+

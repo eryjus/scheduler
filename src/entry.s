@@ -12,6 +12,7 @@
 ;;     Date      Tracker  Version  Pgmr  Description
 ;;  -----------  -------  -------  ----  --------------------------------------------------------------------------
 ;;  2019-Sep-21  Initial   0.0.0   ADCL  Initial version
+;;  2019-Sep-29  Step03   step03   ADCL  Add the timer initialization to the startup
 ;;
 ;;===================================================================================================================
 
@@ -26,6 +27,7 @@
 ;; -- things that need to be seen here but are outside this source
 ;;    ------------------------------------------------------------
         extern      kMain
+        extern      counter
 
 
 ;;
@@ -57,7 +59,7 @@ gdtLoc:
 
         align       8
 idtSize:
-        dw          0x7f
+        dw          0x3ff
 idtLoc:
         dd          0x17f000
 
@@ -66,6 +68,9 @@ idtLoc:
 ;;    ------------------------------
         section     .text
 entry:
+        ;; -- initialize the counter
+        mov         dword [counter],0
+
         mov         eax,idtSize
         lidt        [eax]
 

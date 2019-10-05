@@ -8,6 +8,7 @@
 //  -----------  -------  -------  ----  --------------------------------------------------------------------------
 //  2019-Sep-21  Initial  step01   ADCL  Initial version
 //  2019-Sep-25  Step 2   step02   ADCL  Add `Schedule()`
+//  2019-Oct-05  Step 3   step03   ADCL  Add a call to `UpdateTimeUsed()`
 //
 //===================================================================================================================
 
@@ -53,6 +54,8 @@ extern "C"
     PCB_t *CreateProcess(void (*ent)());
 
     void Schedule(void);
+
+    void UpdateTimeUsed(void);
 }
 
 #endif

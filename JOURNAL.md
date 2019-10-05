@@ -336,3 +336,165 @@ This, of course, cleans up my problems with `-O0` as well.
 
 And my theory was wrong -- which I should have known better!
 
+---
+
+### 2019-Sep-27
+
+## Branch `step03`
+
+This is an optional step, but one well worth taking on.  This step implements some time accounting functions.  For this to work for what I am working with, I would need to parse the ACPI tables for the APIC, parse the ACPI tables for the HPET, or just implement the timer to increment ticks at a specific interval.  For the first 2, I would need to fall back on the last just in case it was not supported anyway.  I am trying to remain simple here, so the timer interrupt is the way to go.
+
+Note that I do not feel that the RTC will provide the granularity I need and therefore will not be used.
+
+So, to do this, I will need to set up the PIC and the IDT.  I will need to make sure that the timer fires properly and update a global counter.
+
+---
+
+So, let's talk a little bit about the granularity we will measure.  Brendan recommends that we keep track of timings in a relatively high precision resolution.  In fact, the tutorial mentions nanosecond resolution -- 1 billionth of a second.  Therefore, 1 second would be 1,000,000,000 ticks.  At 32-bit unsigned integers, that would be just over 4 seconds before we roll over the clock.  64- or 128-bit integers require some fancy work to implement -- well, more than I am putting in for this test.
+
+Ok, so microsecond resolution, or 1 millionth of a second.  That would be 4294 seconds before rolling over, or 71.6 minutes.
+
+Finally, millisecond resolution, or 1 thousanth of a second.  That would be 4,294,967 seconds before rolling over, or 71,582 minutes, or 1193 hours, or 49 days.  While that would still not work for a "real" operating system, that will work for this test.  And millisecond resolution is just fine for me.
+
+Now, for the 64-bit OS, you will likely have access to 128-bit registers and will be able to implement nanosecond resolution with a rollover time of about 584 years -- totally adequate.  With a 32-bit cpu, some software math libraries are needed for this and I do not want to go working those out.
+
+By the way, for the real numbers in more production-ready 32-bit OS, I would probably need to implement a larger BCD (Binary Coded Decimal) arithmetic library and printing functions.
+
+Now, it is very easy to align the timer with this counter resolution: 1ms, which I will do.
+
+So, what this does, however, is set up for some serious inaccuracies in the timer code.  We will be switching tasks initially far more frequently than once per millisecond.  It will be luck of the draw on which task gets the "credit" for the CPU time.  For the purposes of this test, I can live with this.
+
+---
+
+### 2019-Sep-29
+
+Now for the implementation part.  The first thing I need to do is register an ISR handler into the IDT table.  This now starts another conversation -- how far to I go with these interrupt handlers?
+
+Well, this is a purpose-built test, so I do not plan on going very far.  My only plan at this point in time is to register the ISR for IRQ0 and leave it at that.  Until the IDT is constructed properly, the system will triple-fault anyway so there is nothing to be gained to have a ready-made exception handler for every possible contingency.
+
+[Century-OS](https://github.com/eryjus/century-os) also has the ability to register and de-register a custom handler into a jump table.  I am not going to do that either.  I am going to register the handler into the IDT directly -- something I may decide to go back and do later in [Century-OS](https://github.com/eryjus/century-os).
+
+So, let's review.  I already have an IDT registered:
+
+```asm
+        align       8
+idtSize:
+        dw          0x7f
+idtLoc:
+        dd          0x17f000
+```
+
+So, the IDT is located at `0x17f000`.  Again, paging is not enabled, so that is not a factor.  I just need a pointer to that memory address, a structure definition, and a function to write the fields of that structure.
+
+I code....
+
+---
+
+OK, I have that done, but not tested.  I now need a handler that will increment the timer.  This should be relatively simple as all I need to do is increment a value in memory and then `iret`.  No need to save any registers I do not touch.
+
+---
+
+Finally, I need to initialize the PIT and PIC.
+
+---
+
+### 2019-Oct-04
+
+Today, I pick up where I left off setting up the PIC and PIT.  Since this is purpose-built, I will not be developing proper driver and no abstraction.
+
+---
+
+OK, I did manage to get some coding done today.  I do need to be able to issue an EOI.  I save that for tomorrow.
+
+---
+
+### 2019-Oct-05
+
+I have finished the cleanup for the counter.  Interrupts should be able to fire and the counter should increment in ticks.
+
+---
+
+So, after an initial problem with getting the 8259 data and command ports mixed up, I am now triple faulting with the vector being out of range for the IDT.  
+
+```
+00143483792e[CPU0  ] interrupt(): vector must be within IDT table limits, IDT.limit = 0x7f
+00143483792e[CPU0  ] interrupt(): gate descriptor is not valid sys seg (vector=0x0d)
+00143483792e[CPU0  ] interrupt(): gate descriptor is not valid sys seg (vector=0x08)
+00143483792i[CPU0  ] CPU is in protected mode (active)
+00143483792i[CPU0  ] CS.mode = 32 bit
+00143483792i[CPU0  ] SS.mode = 32 bit
+00143483792i[CPU0  ] EFER   = 0x00000000
+00143483792i[CPU0  ] | EAX=00000004  EBX=00010000  ECX=00000007  EDX=0000000a
+00143483792i[CPU0  ] | ESP=00180ff4  EBP=00000000  ESI=00000000  EDI=00000000
+00143483792i[CPU0  ] | IOPL=0 id vip vif ac vm RF nt of df IF tf sf zf af pf cf
+00143483792i[CPU0  ] | SEG sltr(index|ti|rpl)     base    limit G D
+00143483792i[CPU0  ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
+00143483792i[CPU0  ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00143483792i[CPU0  ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00143483792i[CPU0  ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00143483792i[CPU0  ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00143483792i[CPU0  ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00143483792i[CPU0  ] | EIP=001001a1 (001001a1)
+00143483792i[CPU0  ] | CR0=0x60000011 CR2=0x00000000
+00143483792i[CPU0  ] | CR3=0x00000000 CR4=0x00000000
+(0).[143483792] [0x0000001001a1] 0008:00000000001001a1 (unk. ctxt): call .-198 (0x001000e0)   ; e83affffff
+00143483792p[CPU0  ] >>PANIC<< exception(): 3rd (13) exception with no resolution
+```
+
+So, `IDT.limit` is `0x7f`, and the limit should be `(4 * 256) - 1` or `0x3ff`.
+
+So, with that fixed, I have a new and improved triple fault:
+
+```
+00144406767e[CPU0  ] interrupt(): gate.type(12) != {5,6,7,14,15}
+00144406767e[CPU0  ] interrupt(): gate.type(12) != {5,6,7,14,15}
+00144406767e[CPU0  ] interrupt(): gate descriptor is not valid sys seg (vector=0x08)
+00144406767i[CPU0  ] CPU is in protected mode (active)
+00144406767i[CPU0  ] CS.mode = 32 bit
+00144406767i[CPU0  ] SS.mode = 32 bit
+00144406767i[CPU0  ] EFER   = 0x00000000
+00144406767i[CPU0  ] | EAX=00000000  EBX=00000000  ECX=00000034  EDX=00000000
+00144406767i[CPU0  ] | ESP=001003b0  EBP=00000000  ESI=00000005  EDI=cccccccd
+00144406767i[CPU0  ] | IOPL=0 id vip vif ac vm RF nt of df IF tf sf ZF af PF cf
+00144406767i[CPU0  ] | SEG sltr(index|ti|rpl)     base    limit G D
+00144406767i[CPU0  ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
+00144406767i[CPU0  ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00144406767i[CPU0  ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00144406767i[CPU0  ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00144406767i[CPU0  ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00144406767i[CPU0  ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00144406767i[CPU0  ] | EIP=001003bd (001003bd)
+00144406767i[CPU0  ] | CR0=0x60000011 CR2=0x00000000
+00144406767i[CPU0  ] | CR3=0x00000000 CR4=0x00000000
+(0).[144406767] [0x0000001003bd] 0008:00000000001003bd (unk. ctxt): int3                      ; cc
+00144406767p[CPU0  ] >>PANIC<< exception(): 3rd (13) exception with no resolution
+```
+
+So, it looks like I am not programming the vector properly.  This will be a little harder to track down.
+
+First, what is at `eip`?
+
+```asm
+  1003b0:       c3                      ret    
+  1003b1:       8d b4 26 00 00 00 00    lea    0x0(%esi,%eiz,1),%esi
+  1003b8:       8d b4 26 00 00 00 00    lea    0x0(%esi,%eiz,1),%esi
+  1003bf:       90                      nop
+```
+
+So, it looks like I am executing off the end of someting.  I will need to see the instructions leading up to that.
+
+---
+
+I had a bug in my `WriteDec()` code.  With that fixed, everything works.
+
+So, now I need to collect the number of ticks and store them in the processes at task swap.
+
+This appears to be working properly.  I think I am ready to commit this code.
+
+
+
+
+
+
+
+
