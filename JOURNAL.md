@@ -504,9 +504,13 @@ The tasks we are going to complete in this step are:
 
 Well, I was able to get most of the Step 4 code written yesterday and I was able to test and quickly address the small bug I had.  This change came together very quickly.
 
+### 2019-Oct-24
 
+I committed the `step04` branch today.
 
+## Branch `step05`
 
+This next step will add some basic locking functionality to the scheduler.  These rudamentary locks will form the foundation for a more robust lock later on.  It's really about laying the fountation for later enhancement.
 
 
 

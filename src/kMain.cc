@@ -11,6 +11,7 @@
 //  2019-Sep-25  Step 2   step02   ADCL  Add `Schedule()` and update the processes
 //  2019-Sep-29  Step 3   step03   ADCL  Add the timer initialization into the code
 //  2019-Oct-05  Step 4   step04   ADCL  Add a process state -- sanity check
+//  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
 //
 //===================================================================================================================
 
@@ -43,7 +44,10 @@ void Process(void)
         if (currentPCB->state == RUNNING) WriteChar(ch);
         else WriteChar(ch - 'A' + 'a');
         
+        // -- lock the scheduler before we make changes
+        LockScheduler();
         Schedule();
+        UnlockScheduler();
     }
 }
 

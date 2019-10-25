@@ -10,6 +10,7 @@
 ;;  2019-Sep-26  Step 01   step01  ADCL  Fix a stack symmetry issue
 ;;  2019-Oct-05  Step 3    step03  ADCL  Add the call to `UpdateTimeUsed()`
 ;;  2019-Oct-05  Step 4    step04  ADCL  Create a process state
+;;  2019-Oct-24  Step 5    step05  ADCL  Add rudamentary scheduler lock
 ;;
 ;;===================================================================================================================
 
@@ -61,6 +62,9 @@ READY   equ         1
 ;;    * segment registers do not need to be saves -- kernel segments to kernel segments
 ;;    
 ;;    IRQs are required to be disabled prior to calling and restored on exit
+;;
+;;    !!!! The caller must have called LockScheduler() and must call !!!!
+;;    !!!! UnlockScheduler() before and after the call to Schedule() !!!!
 ;;    ---------------------------------------------------------------------------------
 SwitchToTask:
         push        ebx
