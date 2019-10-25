@@ -9,6 +9,7 @@
 //  2019-Sep-22  Initial  step01   ADCL  Initial version
 //  2019-Sep-25  Step 2   step02   ADCL  Add `Schedule()` and create a circular linked list
 //  2019-Oct-05  Step 3   step03   ADCL  Add timer-related functions to the scheduler
+//  2019-Oct-05  Step 4   step04   ADCL  Updates for process states
 //
 //===================================================================================================================
 
