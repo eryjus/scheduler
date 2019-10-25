@@ -10,6 +10,7 @@
 //  2019-Sep-23  Step 1   step01   ADCL  Complete Step 1 of the tutorial
 //  2019-Sep-25  Step 2   step02   ADCL  Add `Schedule()` and update the processes
 //  2019-Sep-29  Step 3   step03   ADCL  Add the timer initialization into the code
+//  2019-Oct-05  Step 4   step04   ADCL  Add a process state -- sanity check
 //
 //===================================================================================================================
 
@@ -38,6 +39,7 @@ void Process(void)
 {
     char ch = pch ++;
     while (true) {
+        // -- sanity check for the state -- lower case is broken
         if (currentPCB->state == RUNNING) WriteChar(ch);
         else WriteChar(ch - 'A' + 'a');
         
