@@ -10,6 +10,7 @@
 //  2019-Sep-25  Step 2   step02   ADCL  Add `Schedule()`
 //  2019-Oct-05  Step 3   step03   ADCL  Add a call to `UpdateTimeUsed()`
 //  2019-Oct-05  Step 4   step04   ADCL  Create a process state
+//  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
 //
 //===================================================================================================================
 
@@ -77,6 +78,9 @@ extern "C"
 
     void AddReady(PCB_t *task);
     PCB_t *NextReady(void);
+
+    void LockScheduler(void); 
+    void UnlockScheduler(void);
 }
 
 #endif

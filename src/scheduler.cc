@@ -10,6 +10,7 @@
 //  2019-Sep-25  Step 2   step02   ADCL  Add `Schedule()` and create a circular linked list
 //  2019-Oct-05  Step 3   step03   ADCL  Add timer-related functions to the scheduler
 //  2019-Oct-05  Step 4   step04   ADCL  Updates for process states
+//  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
 //
 //===================================================================================================================
 
@@ -22,6 +23,12 @@
 // -- PUSH a value on the stack for a new process
 //    -------------------------------------------
 #define PUSH(tos,val) (*(-- tos) = val)
+
+
+//
+// -- The number of times IRQs have been disbled
+//    ------------------------------------------
+static int irqDisableCounter = 0;
 
 
 //
@@ -104,7 +111,7 @@ void PcbFree(PCB_t *pcb)
 //    ---------------------------------------------------------------------------
 static void ProcessStartup(void) 
 {
-
+    UnlockScheduler();
 }
 
 
@@ -171,6 +178,9 @@ PCB_t *CreateProcess(void (*ent)())
 
 //
 // -- based on what is currently running (roun-robin style), select the next task
+//
+//    !!!! The caller must have called LockScheduler() and must call !!!!
+//    !!!! UnlockScheduler() before and after the call to Schedule() !!!!
 //    ---------------------------------------------------------------------------
 void Schedule(void) 
 {
@@ -191,6 +201,26 @@ void UpdateTimeUsed(void)
     unsigned long c = lastCounter;
     lastCounter = GetCurrentCounter();
     currentPCB->used += (lastCounter - c);
+}
+
+
+//
+// -- Lock the scheduler
+//    ------------------
+void LockScheduler(void) 
+{
+    CLI();
+    irqDisableCounter ++;
+}
+
+
+//
+// -- Unlock the scheduler
+//    --------------------
+void UnlockScheduler(void)
+{
+    irqDisableCounter --;
+    if (irqDisableCounter == 0) STI();
 }
 
 
