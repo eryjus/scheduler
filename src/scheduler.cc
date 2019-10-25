@@ -30,6 +30,13 @@ PCB_t *currentPCB;
 
 
 //
+// -- The list of ready to run processes
+//    ----------------------------------
+PCB_t *readyListHead;
+PCB_t *readyListTail;
+
+
+//
 // -- This is the array of possible running tasks
 //    -------------------------------------------
 PCB_t pcbArray[MAX_TASKS];
@@ -51,10 +58,13 @@ void InitScheduler(void)
     pcbArray[0].used = 1;
     pcbArray[0].tos = 0;
     pcbArray[0].virtAddr = GetCR3();
-    pcbArray[0].state = 0;
-    pcbArray[0].next = &pcbArray[0];
+    pcbArray[0].state = RUNNING;
+    pcbArray[0].next = (PCB_t *)0;
 
     currentPCB = &pcbArray[0];
+
+    readyListHead = (PCB_t *)0;
+    readyListTail = (PCB_t *)0;
 
     lastCounter = GetCurrentCounter();
 }
@@ -98,6 +108,41 @@ static void ProcessStartup(void)
 
 
 //
+// -- Add a process to the list of ready tasks
+//    ----------------------------------------
+void AddReady(PCB_t *task)
+{
+    if (!task) return;
+
+    task->state = READY;
+
+    if (readyListHead == (PCB_t *)0) {
+        readyListHead = readyListTail = task;
+    } else {
+        readyListTail->next = task;
+        readyListTail = task;
+    }
+}
+
+
+//
+// -- Get the next ready task, removing it from the list
+//    WARNING: Might return NULL!!!
+//    --------------------------------------------------
+PCB_t *NextReady(void)
+{
+    if (readyListHead == (PCB_t *)0) return (PCB_t *)0;
+
+    PCB_t *rv = readyListHead;
+    readyListHead = readyListHead->next;
+
+    if (readyListHead == (PCB_t *)0) readyListTail = readyListHead;
+
+    return rv;
+}
+
+
+//
 // -- Create a new process with its entry point
 //    -----------------------------------------
 PCB_t *CreateProcess(void (*ent)())
@@ -117,12 +162,7 @@ PCB_t *CreateProcess(void (*ent)())
     rv->tos = (unsigned int)tos;
     rv->virtAddr = GetCR3();
 
-    //
-    // -- this bit of code will add the new process right after the first thing we started with -- 
-    //    the kernel init; I like this better than fiddling with the `currentPcb` variable.
-    //    ----------------------------------------------------------------------------------------
-    rv->next = pcbArray[0].next;
-    pcbArray[0].next = rv;
+    AddReady(rv);
 
     return rv;
 }
@@ -133,7 +173,12 @@ PCB_t *CreateProcess(void (*ent)())
 //    ---------------------------------------------------------------------------
 void Schedule(void) 
 {
-    SwitchToTask(currentPCB->next);
+    PCB_t *next = NextReady();
+
+    if (next) {
+        AddReady(currentPCB);
+        SwitchToTask(next);
+    }
 }
 
 

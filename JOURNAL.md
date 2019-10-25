@@ -491,6 +491,21 @@ So, now I need to collect the number of ticks and store them in the processes at
 
 This appears to be working properly.  I think I am ready to commit this code.
 
+## Branch `step04`
+
+In this step we will undo several of the things we did in step02 and replace them with constructs that are geared for the final kernel scheduler.
+
+The tasks we are going to complete in this step are:
+* break the circular linked list and have `currentPCB` actually point to the current task on the CPU
+* create a new set of variables for the ready-to-run processes which mark the head and tail of the list
+* create a set of states that are used to indciate what the task is waiting for and therefore where is it located.
+
+### 2019-Oct-06
+
+Well, I was able to get most of the Step 4 code written yesterday and I was able to test and quickly address the small bug I had.  This change came together very quickly.
+
+
+
 
 
 

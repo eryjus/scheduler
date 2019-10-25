@@ -25,6 +25,7 @@
 ;;    --------------------------------------------------------------------
         extern      currentPCB
         extern      UpdateTimeUsed
+        extern      AddReady
 
 
 ;;
@@ -32,6 +33,14 @@
 ;;    ----------------------------------
 TOS     equ         0
 VAS     equ         4
+STATE   equ         12
+
+
+;;
+;; -- These are the different states
+;;    ------------------------------
+RUNNING equ         0
+READY   equ         1
 
 
 ;;
@@ -58,9 +67,18 @@ SwitchToTask:
         push        edi
         push        ebp
 
+        mov         edi,[currentPCB]        ;; `edi` = previous tasks PCB
+
+        cmp         dword [edi+STATE],RUNNING     ;; is the task RUNNING?
+        jne         .noReady                ;; if not, no need to ready it
+
+        push        edi                     ;; push the current process onto the stack
+        call        AddReady                ;; add it to the ready list
+        add         esp,4                   ;; drop the value from the stack
+
+.noReady:
         call        UpdateTimeUsed          ;; update the time used field before swapping
 
-        mov         edi,[currentPCB]        ;; `edi` = previous tasks PCB
         mov         [edi+TOS],esp           ;; save the top of the stack
 
 
@@ -72,6 +90,7 @@ SwitchToTask:
 
         mov         esp,[esi+TOS]           ;; load the next process's stack
         mov         eax,[esi+VAS]           ;; load the next process's virtual address space
+        mov         dword [esi+STATE],RUNNING     ;; make the current task running
 
         ;; -- fix tss.esp0 here
 
