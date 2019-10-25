@@ -38,7 +38,9 @@ void Process(void)
 {
     char ch = pch ++;
     while (true) {
-        WriteChar(ch);
+        if (currentPCB->state == RUNNING) WriteChar(ch);
+        else WriteChar(ch - 'A' + 'a');
+        
         Schedule();
     }
 }
@@ -71,12 +73,5 @@ void kMain(void)
     CreateProcess(Process);
     CreateProcess(Process);
 
-    // -- Now, we call process ourselves
-    while (true) {
-        WriteStr("The current process has used ");
-        WriteDecimal(currentPCB->used);
-        WriteChar('\n');
-
-        Schedule();
-    }
+    Process();
 }

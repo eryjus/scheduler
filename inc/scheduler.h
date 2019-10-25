@@ -17,6 +17,13 @@
 #define __SCHEDULER_H__
 
 
+typedef enum {
+    RUNNING = 0,
+    READY = 1,
+} ProcessState_t;
+
+
+
 //
 // -- This is the Process Control Block -- for controlling processes by the scheduler
 //    -------------------------------------------------------------------------------
@@ -33,6 +40,13 @@ typedef struct PCB_t {
 // -- We need to keep track of the current task
 //    -----------------------------------------
 extern PCB_t *currentPCB;
+
+
+//
+// -- This is the head/tail list of ready to run processes
+//    ----------------------------------------------------
+extern PCB_t *readyListHead;
+extern PCB_t *readyListTail;
 
 
 //
@@ -56,6 +70,9 @@ extern "C"
     void Schedule(void);
 
     void UpdateTimeUsed(void);
+
+    void AddReady(PCB_t *task);
+    PCB_t *NextReady(void);
 }
 
 #endif
