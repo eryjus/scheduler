@@ -11,6 +11,7 @@
 //  2019-Oct-05  Step 3   step03   ADCL  Add timer-related functions to the scheduler
 //  2019-Oct-05  Step 4   step04   ADCL  Updates for process states
 //  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
+//  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
 //
 //===================================================================================================================
 
@@ -170,7 +171,9 @@ PCB_t *CreateProcess(void (*ent)())
     rv->tos = (unsigned int)tos;
     rv->virtAddr = GetCR3();
 
+    LockScheduler();
     AddReady(rv);
+    UnlockScheduler();
 
     return rv;
 }
@@ -187,7 +190,6 @@ void Schedule(void)
     PCB_t *next = NextReady();
 
     if (next) {
-        AddReady(currentPCB);
         SwitchToTask(next);
     }
 }
@@ -221,6 +223,35 @@ void UnlockScheduler(void)
 {
     irqDisableCounter --;
     if (irqDisableCounter == 0) STI();
+}
+
+
+//
+// -- Block the current process
+//    -------------------------
+void BlockProcess(int reason)
+{
+    LockScheduler();
+    currentPCB->state = reason;
+    Schedule();
+    UnlockScheduler();
+}
+
+
+//
+// -- Unblock a Process
+//    -----------------
+void UnblockProcess(PCB_t *proc) 
+{
+    LockScheduler();
+
+    if (readyListHead == (PCB_t *)0) {
+        SwitchToTask(proc);
+    } else {
+        AddReady(proc);
+    }
+
+    UnlockScheduler();
 }
 
 

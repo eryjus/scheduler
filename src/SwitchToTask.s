@@ -11,6 +11,7 @@
 ;;  2019-Oct-05  Step 3    step03  ADCL  Add the call to `UpdateTimeUsed()`
 ;;  2019-Oct-05  Step 4    step04  ADCL  Create a process state
 ;;  2019-Oct-24  Step 5    step05  ADCL  Add rudamentary scheduler lock
+;;  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
 ;;
 ;;===================================================================================================================
 
@@ -43,6 +44,7 @@ STATE   equ         12
 ;;    ------------------------------
 RUNNING equ         0
 READY   equ         1
+PAUSED  equ         2
 
 
 ;;

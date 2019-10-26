@@ -12,6 +12,7 @@
 //  2019-Sep-29  Step 3   step03   ADCL  Add the timer initialization into the code
 //  2019-Oct-05  Step 4   step04   ADCL  Add a process state -- sanity check
 //  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
+//  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
 //
 //===================================================================================================================
 
@@ -45,9 +46,12 @@ void Process(void)
         else WriteChar(ch - 'A' + 'a');
         
         // -- lock the scheduler before we make changes
-        LockScheduler();
-        Schedule();
-        UnlockScheduler();
+//        LockScheduler();
+//        Schedule();
+//        UnlockScheduler();
+
+        // -- Block processes
+        BlockProcess(PAUSED);
     }
 }
 
@@ -72,12 +76,20 @@ void kMain(void)
     CreateProcess(Process);
     CreateProcess(Process);
     CreateProcess(Process);
-    CreateProcess(Process);
+    PCB_t *p = CreateProcess(Process);
     CreateProcess(Process);
     CreateProcess(Process);
     CreateProcess(Process);
     CreateProcess(Process);
     CreateProcess(Process);
 
-    Process();
+    for (;;) {
+        for (int i = 0; i < 100; i ++) {
+            LockScheduler();
+            Schedule();
+            UnlockScheduler();
+        }
+
+        UnblockProcess(p);
+    }
 }

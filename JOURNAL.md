@@ -512,8 +512,33 @@ I committed the `step04` branch today.
 
 This next step will add some basic locking functionality to the scheduler.  These rudamentary locks will form the foundation for a more robust lock later on.  It's really about laying the fountation for later enhancement.
 
+## Branch `step06`
 
+This branch will create the basic for blocking a process voluntarily.  But not today.
 
+### 2019-Oct-25
 
+The coding for this section went quick enough, but there is a problem where everything is still getting CPU time.
 
+However, what is interesting, is as cycles through the processes went on several did drop off (starting with A-N and then ending with A-I at the end of the page).  Another interesting point is that the letters drop off all at once.
+
+Now, if I move the process I am trying to release, I get a shorter list of resulting characters (say, A-E for example).
+
+---  
+
+It turns out that I had an extra state change in `Schedule()` to set the departing process state to be `READY`.  Commenting this line out made it all work:
+
+```C
+void Schedule(void) 
+{
+    PCB_t *next = NextReady();
+
+    if (next) {
+//        AddReady(currentPCB);
+        SwitchToTask(next);
+    }
+}
+```
+
+So, we just need a little cleanup....
 

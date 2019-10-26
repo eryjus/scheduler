@@ -11,6 +11,7 @@
 //  2019-Oct-05  Step 3   step03   ADCL  Add a call to `UpdateTimeUsed()`
 //  2019-Oct-05  Step 4   step04   ADCL  Create a process state
 //  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
+//  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
 //
 //===================================================================================================================
 
@@ -25,6 +26,7 @@
 typedef enum {
     RUNNING = 0,
     READY = 1,
+    PAUSED = 2,
 } ProcessState_t;
 
 
@@ -69,18 +71,18 @@ extern "C"
     void SwitchToTask(PCB_t *task) __attribute__((cdecl));
     unsigned int GetCR3(void);
 
-    void InitScheduler(void);
-    PCB_t *CreateProcess(void (*ent)());
-
-    void Schedule(void);
-
-    void UpdateTimeUsed(void);
-
     void AddReady(PCB_t *task);
     PCB_t *NextReady(void);
+    void UpdateTimeUsed(void);
 
+    void InitScheduler(void);
     void LockScheduler(void); 
     void UnlockScheduler(void);
+    void Schedule(void);
+
+    PCB_t *CreateProcess(void (*ent)());
+    void BlockProcess(int reason);
+    void UnblockProcess(PCB_t *proc);
 }
 
 #endif
