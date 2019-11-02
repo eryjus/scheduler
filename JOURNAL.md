@@ -542,3 +542,36 @@ void Schedule(void)
 
 So, we just need a little cleanup....
 
+## Step 7 -- sleep requirements
+
+This step in the tutoral is a discussion about the locks that are required for a multiple processes and in particular when multiple processes become unblocked, we need to be able to let the scheduler make the best scheduling decision.
+
+## Branch `step08`
+
+So, as a result of the discussion from #7, we need to improve the locking mechanisms.  
+
+### 2019-Oct-26
+
+I think the text related to this additional locking is confusing.  You absolutely have to read it carefully and for content.  In short, we will be adding a second locking mechanism (with different rules) for locking other things than the scheduler structures.  This lock will be used outside the core of the scheduler for obtaining and releasing locks.
+
+This, in effect, leaves the scheduler lock as a purposeful lock that does not follow the exact same rules as other locks.
+
+Now, with that said, there is a contridiction in the tutorial:
+
+#### From Step 7:
+> ..., we want a way to tell the scheduler to postpone task switches while the kernel is holding any lock (and do the postponed task switch/es when we aren't holding a lock any more), and **we want to do this for all locks including the scheduler's lock.**
+
+#### From Step 8:
+> We already have code for locking and unlocking the scheduler; but you can't really use the same lock that the scheduler uses because you don't want the scheduler to disable task switching every time it needs to do a task switch, so we're going to have a different lock for miscellaneous stuff instead.
+
+
+### 2019-Nov-01
+
+I am still trying to decipher if I am supposed to create a wrapping lock or if I am supposed to replace the scheduler lock with this other one.
+
+OK, finally!!  Later on, `terminate_task()` uses both locks.  With that, I now know I need to keep them both.
+
+So, Brendan calls his function `lock_stuff()`.  I think this is a little misleading.  I will name my own `LockAndPostpone()` since the purpose is not only to obtain a lock but also to postpone process changes.  Normally, I would make it so that we would pass in which lock to obtain, but in keeping with Brendan's thoughts, we will keep it simple.
+
+This is actually, after all the analysis, a trivial change in preparation for the next step.
+
