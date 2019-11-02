@@ -12,6 +12,7 @@
 //  2019-Oct-05  Step 4   step04   ADCL  Updates for process states
 //  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
 //  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
+//  2019-Nov-01  Step 8   step08   ADCL  Add checks for postponed task changes
 //
 //===================================================================================================================
 
@@ -30,6 +31,17 @@
 // -- The number of times IRQs have been disbled
 //    ------------------------------------------
 static int irqDisableCounter = 0;
+
+//
+// -- The number of times locks that would postpone task swaps have been obtained
+//    ---------------------------------------------------------------------------
+int postponeTaskCounter = 0;
+
+
+//
+// -- Has a task change been postponed?
+//    ---------------------------------
+bool taskChangePostponedFlag = false;
 
 
 //
@@ -187,6 +199,11 @@ PCB_t *CreateProcess(void (*ent)())
 //    ---------------------------------------------------------------------------
 void Schedule(void) 
 {
+    if (postponeTaskCounter != 0) {
+        taskChangePostponedFlag = true;
+        return;
+    }
+
     PCB_t *next = NextReady();
 
     if (next) {
@@ -224,6 +241,36 @@ void UnlockScheduler(void)
     irqDisableCounter --;
     if (irqDisableCounter == 0) STI();
 }
+
+
+//
+// -- Obtain a lock (global for now) and postpone task changes
+//    --------------------------------------------------------
+void LockAndPostpone(void) 
+{
+    CLI();
+    irqDisableCounter ++;
+    postponeTaskCounter ++;
+}
+
+
+//
+// -- Unlock a lock (global for now) and perform a Schedule if we can
+//    ---------------------------------------------------------------
+void UnlockAndSchedule(void)
+{
+    postponeTaskCounter --;
+    if (postponeTaskCounter == 0) {
+        if (taskChangePostponedFlag) {
+            taskChangePostponedFlag = false;
+            Schedule();
+        }
+    }
+
+    irqDisableCounter --;
+    if (irqDisableCounter == 0) STI();
+}
+
 
 
 //

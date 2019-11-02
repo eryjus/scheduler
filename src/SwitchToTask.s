@@ -11,7 +11,8 @@
 ;;  2019-Oct-05  Step 3    step03  ADCL  Add the call to `UpdateTimeUsed()`
 ;;  2019-Oct-05  Step 4    step04  ADCL  Create a process state
 ;;  2019-Oct-24  Step 5    step05  ADCL  Add rudamentary scheduler lock
-;;  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
+;;  2019-Oct-25  Step 6    step06  ADCL  Add the ability to block/unblock
+;;  2019-Nov-01  Step 8    step08  ADCL  Add checks for postponed task changes
 ;;
 ;;===================================================================================================================
 
@@ -29,6 +30,8 @@
         extern      currentPCB
         extern      UpdateTimeUsed
         extern      AddReady
+        extern      postponeTaskCounter
+        extern      taskChangePostponedFlag
 
 
 ;;
@@ -69,6 +72,12 @@ PAUSED  equ         2
 ;;    !!!! UnlockScheduler() before and after the call to Schedule() !!!!
 ;;    ---------------------------------------------------------------------------------
 SwitchToTask:
+        cmp         dword [postponeTaskCounter],0   ;; are we OK to change tasks?
+        je          .swap
+        mov         dword [taskChangePostponedFlag],1   ;; note we are ready to postpone tasks
+        ret
+
+.swap:
         push        ebx
         push        esi
         push        edi
