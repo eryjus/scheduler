@@ -13,6 +13,7 @@
 ;;  2019-Oct-24  Step 5    step05  ADCL  Add rudamentary scheduler lock
 ;;  2019-Oct-25  Step 6    step06  ADCL  Add the ability to block/unblock
 ;;  2019-Nov-01  Step 8    step08  ADCL  Add checks for postponed task changes
+;;  2019-Nov-05  Step 9    step09  ADCL  Add sleeping to the process repetoire
 ;;
 ;;===================================================================================================================
 
@@ -48,6 +49,7 @@ STATE   equ         12
 RUNNING equ         0
 READY   equ         1
 PAUSED  equ         2
+SLEEPING    equ     3
 
 
 ;;

@@ -7,6 +7,7 @@
 //     Date      Tracker  Version  Pgmr  Description
 //  -----------  -------  -------  ----  --------------------------------------------------------------------------
 //  2019-Sep-29  Initial  step03   ADCL  Initial version
+//  2019-Nov-05  Step 9   step08   ADCL  Fix bug with PIC initialization
 //
 //===================================================================================================================
 
@@ -68,6 +69,9 @@ void InitTimer(void)
     OUTB(0x43, 0x36);
     OUTB(0x40, l);
     OUTB(0x40, h);
+
+    OUTB(0x21, 0x00);            // Enable all IRQs
+    OUTB(0xa1, 0x00);             // Enable all IRQs
 }
 
 
