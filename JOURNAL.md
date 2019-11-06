@@ -575,3 +575,42 @@ So, Brendan calls his function `lock_stuff()`.  I think this is a little mislead
 
 This is actually, after all the analysis, a trivial change in preparation for the next step.
 
+## Branch `step09`
+
+Now, we have the foundation to implement the sleep functions.  The tutorial has a granularity of 1ns (or 1/1,000,000,000 or a second), but for my implementation I have 1ms granularity.  So for this purpose-built test, I am going to stick with 1ms granularity.  So, there will be just `Sleep()` and `SleepUntil()` implementation; and since `Sleep()` will call `SleepUntil()`, that is the function I need to focus on.
+
+### 2019-Nov-03
+
+Today I start debugging my timer.  Nothing appears to be working so I have to set up some debugging code to work it all out.
+
+So, it looks like I get 1 interrupt and then nothing.  So, I think I need to EOI before I call the handler.
+
+### 2019-Nov-04
+
+OK, I thought this was working before and I was able to confirm: when I comment out all the calls to create a process and only look for a timer, everything works properly.  So my timer code is correct as far as I can tell.
+
+I need to find out why creating a new process kills the timer.
+
+And as expected, the timer does not fire again when I create a new process.
+
+### 2019-Nov-05
+
+OK, so I want to identify what is going on with when creating a process and why interrupts are not being re-enabled.  Looking at the logs, I am not able to see that the new process is calling `ProcessStartup()`.
+
+So, reversing the order of these lines to this:
+
+```C
+    PUSH(tos, (unsigned int)ent);        // entry point
+    PUSH(tos, (unsigned int)ProcessStartup);  // startup function
+```
+
+... fixed that problem.  Now at least gets the timer to fire.
+
+However, sleep is not working.  Or at least the processes are not waking up.
+
+So, the problem happened to be in `UnblockProcess()` where it was attempting to do an immediate change to a process when task changes were postponed.  Cleaning this up (to only make the process ready) solved this last problem.
+
+So, with this, I think I am ready to commit.
+
+
+

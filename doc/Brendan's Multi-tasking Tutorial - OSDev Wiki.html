@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html dir="ltr" class="client-js" lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Brendan's Multi-tasking Tutorial - OSDev Wiki</title>
+<meta charset="UTF-8">
+<meta name="generator" content="MediaWiki 1.18.0">
+<link rel="shortcut icon" href="https://wiki.osdev.org/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="https://wiki.osdev.org/opensearch_desc.php" title="OSDev Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="https://wiki.osdev.org/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="OSDev Wiki Atom feed" href="https://wiki.osdev.org/index.php?title=Special:RecentChanges&amp;feed=atom">
+<link rel="stylesheet" href="Brendan's%20Multi-tasking%20Tutorial%20-%20OSDev%20Wiki_files/load.css">
+<style type="text/css" media="all">.mw-collapsible-toggle{float:right} li .mw-collapsible-toggle{float:none} .mw-collapsible-toggle-li{list-style:none}
+
+/* cache key: wikidb:resourceloader:filter:minify-css:4:4250852ed2349a0d4d0fc6509a3e7d4c */
+</style><style type="text/css" media="all">.js-messagebox{margin:1em 5%;padding:0.5em 2.5%;border:1px solid #ccc;background-color:#fcfcfc;font-size:0.8em}.js-messagebox .js-messagebox-group{margin:1px;padding:0.5em 2.5%;border-bottom:1px solid #ddd}.js-messagebox .js-messagebox-group:last-child{border-bottom:thin none transparent}
+
+/* cache key: wikidb:resourceloader:filter:minify-css:4:8b08bdc91c52a9ffba396dccfb5b473c */
+</style><meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="Brendan's%20Multi-tasking%20Tutorial%20-%20OSDev%20Wiki_files/load_002.css">
+<style>a:lang(ar),a:lang(ckb),a:lang(fa),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}a.new,#quickbar a.new{color:#ba0000}
+
+/* cache key: wikidb:resourceloader:filter:minify-css:4:c88e2bcd56513749bec09a7e29cb3ffa */
+</style>
+<script src="Brendan's%20Multi-tasking%20Tutorial%20-%20OSDev%20Wiki_files/load_006.php"></script><script src="Brendan's%20Multi-tasking%20Tutorial%20-%20OSDev%20Wiki_files/load.php"></script>
+<script>if(window.mw){
+	mw.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "Brendan\'s_Multi-tasking_Tutorial", "wgTitle": "Brendan\'s Multi-tasking Tutorial", "wgCurRevisionId": 24039, "wgArticleId": 4285, "wgIsArticle": true, "wgAction": "view", "wgUserName": null, "wgUserGroups": ["*"], "wgCategories": [], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": []});
+}
+</script><script>if(window.mw){
+	mw.loader.load(["mediawiki.page.startup"]);
+}
+</script><script type="text/javascript" src="Brendan's%20Multi-tasking%20Tutorial%20-%20OSDev%20Wiki_files/load_004.php"></script>
+<style type="text/css">/*<![CDATA[*/
+.source-asm {line-height: normal;}
+.source-asm li, .source-asm pre {
+	line-height: normal; border: 0px none white;
+}
+/**
+ * GeSHi Dynamically Generated Stylesheet
+ * --------------------------------------
+ * Dynamically generated stylesheet for asm
+ * CSS class: source-asm, CSS id: 
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ * --------------------------------------
+ */
+.asm.source-asm .de1, .asm.source-asm .de2 {font: normal normal 1em/1.2em monospace; margin:0; padding:0; background:none; vertical-align:top;}
+.asm.source-asm  {font-family:monospace;}
+.asm.source-asm .imp {font-weight: bold; color: red;}
+.asm.source-asm li, .asm.source-asm .li1 {font-weight: normal; vertical-align:top;}
+.asm.source-asm .ln {width:1px;text-align:right;margin:0;padding:0 2px;vertical-align:top;}
+.asm.source-asm .li2 {font-weight: bold; vertical-align:top;}
+.asm.source-asm .kw1 {color: #00007f; font-weight: bold;}
+.asm.source-asm .kw2 {color: #0000ff; font-weight: bold;}
+.asm.source-asm .kw3 {color: #00007f;}
+.asm.source-asm .kw4 {color: #000000; font-weight: bold;}
+.asm.source-asm .kw5 {color: #000000; font-weight: bold;}
+.asm.source-asm .co1 {color: #666666; font-style: italic;}
+.asm.source-asm .co2 {color: #adadad; font-style: italic;}
+.asm.source-asm .es0 {color: #000099; font-weight: bold;}
+.asm.source-asm .br0 {color: #009900; font-weight: bold;}
+.asm.source-asm .sy0 {color: #339933;}
+.asm.source-asm .st0 {color: #7f007f;}
+.asm.source-asm .nu0 {color: #0000ff;}
+.asm.source-asm .ln-xtra, .asm.source-asm li.ln-xtra, .asm.source-asm div.ln-xtra {background-color: #ffc;}
+.asm.source-asm span.xtra { display:block; }
+
+/*]]>*/
+</style>
+<style type="text/css">/*<![CDATA[*/
+@import "/index.php?title=MediaWiki:Geshi.css&usemsgcache=yes&action=raw&ctype=text/css&smaxage=18000";
+/*]]>*/
+</style><style type="text/css">/*<![CDATA[*/
+.source-c {line-height: normal;}
+.source-c li, .source-c pre {
+	line-height: normal; border: 0px none white;
+}
+/**
+ * GeSHi Dynamically Generated Stylesheet
+ * --------------------------------------
+ * Dynamically generated stylesheet for c
+ * CSS class: source-c, CSS id: 
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ * --------------------------------------
+ */
+.c.source-c .de1, .c.source-c .de2 {font: normal normal 1em/1.2em monospace; margin:0; padding:0; background:none; vertical-align:top;}
+.c.source-c  {font-family:monospace;}
+.c.source-c .imp {font-weight: bold; color: red;}
+.c.source-c li, .c.source-c .li1 {font-weight: normal; vertical-align:top;}
+.c.source-c .ln {width:1px;text-align:right;margin:0;padding:0 2px;vertical-align:top;}
+.c.source-c .li2 {font-weight: bold; vertical-align:top;}
+.c.source-c .kw1 {color: #b1b100;}
+.c.source-c .kw2 {color: #000000; font-weight: bold;}
+.c.source-c .kw3 {color: #000066;}
+.c.source-c .kw4 {color: #993333;}
+.c.source-c .co1 {color: #666666; font-style: italic;}
+.c.source-c .co2 {color: #339933;}
+.c.source-c .coMULTI {color: #808080; font-style: italic;}
+.c.source-c .es0 {color: #000099; font-weight: bold;}
+.c.source-c .es1 {color: #000099; font-weight: bold;}
+.c.source-c .es2 {color: #660099; font-weight: bold;}
+.c.source-c .es3 {color: #660099; font-weight: bold;}
+.c.source-c .es4 {color: #660099; font-weight: bold;}
+.c.source-c .es5 {color: #006699; font-weight: bold;}
+.c.source-c .br0 {color: #009900;}
+.c.source-c .sy0 {color: #339933;}
+.c.source-c .st0 {color: #ff0000;}
+.c.source-c .nu0 {color: #0000dd;}
+.c.source-c .nu6 {color: #208080;}
+.c.source-c .nu8 {color: #208080;}
+.c.source-c .nu12 {color: #208080;}
+.c.source-c .nu16 {color:#800080;}
+.c.source-c .nu17 {color:#800080;}
+.c.source-c .nu18 {color:#800080;}
+.c.source-c .nu19 {color:#800080;}
+.c.source-c .me1 {color: #202020;}
+.c.source-c .me2 {color: #202020;}
+.c.source-c .ln-xtra, .c.source-c li.ln-xtra, .c.source-c div.ln-xtra {background-color: #ffc;}
+.c.source-c span.xtra { display:block; }
+
+/*]]>*/
+</style>
+<style type="text/css">/*<![CDATA[*/
+@import "/index.php?title=MediaWiki:Geshi.css&usemsgcache=yes&action=raw&ctype=text/css&smaxage=18000";
+/*]]>*/
+</style><!--[if lt IE 7]><style type="text/css">body{behavior:url("/skins/vector/csshover.min.htc")}</style><![endif]--></head>
+<body class="mediawiki ltr sitedir-ltr ns-0 ns-subject page-Brendan_s_Multi-tasking_Tutorial action-view skin-vector">
+		<div id="mw-page-base" class="noprint"></div>
+		<div id="mw-head-base" class="noprint"></div>
+		<!-- content -->
+		<div id="content">
+			<a id="top"></a>
+			<div id="mw-js-message" style="display:none;" class="js-messagebox"></div>
+						<!-- firstHeading -->
+			<h1 id="firstHeading" class="firstHeading">Brendan's Multi-tasking Tutorial</h1>
+			<!-- /firstHeading -->
+			<!-- bodyContent -->
+			<div id="bodyContent">
+								<!-- tagline -->
+				<div id="siteSub">From OSDev Wiki</div>
+				<!-- /tagline -->
+								<!-- subtitle -->
+				<div id="contentSub"></div>
+				<!-- /subtitle -->
+																<!-- jumpto -->
+				<div id="jump-to-nav">
+					Jump to: <a href="#mw-head">navigation</a>,
+					<a href="#p-search">search</a>
+				</div>
+				<!-- /jumpto -->
+								<!-- bodycontent -->
+				<div dir="ltr" class="mw-content-ltr" lang="en"><table id="toc" class="toc"><tbody><tr><td><div id="toctitle"><h2>Contents</h2><span class="toctoggle">&nbsp;[<a href="#" class="internal" id="togglelink">hide</a>]&nbsp;</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Overview"><span class="tocnumber">1</span> <span class="toctext">Overview</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Step_1:_Initialization_and_.22Switch_to_task.28.29.22"><span class="tocnumber">2</span> <span class="toctext">Step 1: Initialization and "Switch_to_task()"</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="#Step_2:_.22Schedule.28.29.22_Version_1"><span class="tocnumber">3</span> <span class="toctext">Step 2: "Schedule()" Version 1</span></a></li>
+<li class="toclevel-1 tocsection-4"><a href="#Step_3:_Time_Accounting_.28Optional.29"><span class="tocnumber">4</span> <span class="toctext">Step 3: Time Accounting (Optional)</span></a></li>
+<li class="toclevel-1 tocsection-5"><a href="#Step_4:_Task_States_and_.22Schedule.28.29.22_Version_2"><span class="tocnumber">5</span> <span class="toctext">Step 4: Task States and "Schedule()" Version 2</span></a></li>
+<li class="toclevel-1 tocsection-6"><a href="#Step_5:_Race_Conditions_and_Locking_Version_1"><span class="tocnumber">6</span> <span class="toctext">Step 5: Race Conditions and Locking Version 1</span></a></li>
+<li class="toclevel-1 tocsection-7"><a href="#Step_6:_Blocking_and_Unblocking_Tasks"><span class="tocnumber">7</span> <span class="toctext">Step 6: Blocking and Unblocking Tasks</span></a></li>
+<li class="toclevel-1 tocsection-8"><a href="#Step_7:_.22Sleep.28.29.22.2C_.22Nano_sleep.28.29.22_and_.22Nano_sleep_until.28.29.22"><span class="tocnumber">8</span> <span class="toctext">Step 7: "Sleep()", "Nano_sleep()" and "Nano_sleep_until()"</span></a></li>
+<li class="toclevel-1 tocsection-9"><a href="#Step_8:_Locking_Version_2"><span class="tocnumber">9</span> <span class="toctext">Step 8: Locking Version 2</span></a></li>
+<li class="toclevel-1 tocsection-10"><a href="#Step_9:_.22Nano_sleep_until.28.29.22_Again"><span class="tocnumber">10</span> <span class="toctext">Step 9: "Nano_sleep_until()" Again</span></a></li>
+<li class="toclevel-1 tocsection-11"><a href="#Step_10:_Idle_Time"><span class="tocnumber">11</span> <span class="toctext">Step 10: Idle Time</span></a>
+<ul>
+<li class="toclevel-2 tocsection-12"><a href="#Idle_Time_With_Idle_Task"><span class="tocnumber">11.1</span> <span class="toctext">Idle Time With Idle Task</span></a></li>
+<li class="toclevel-2 tocsection-13"><a href="#Idle_Time_Without_Idle_Task"><span class="tocnumber">11.2</span> <span class="toctext">Idle Time Without Idle Task</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-14"><a href="#Step_11:_Time_Slices"><span class="tocnumber">12</span> <span class="toctext">Step 11: Time Slices</span></a></li>
+<li class="toclevel-1 tocsection-15"><a href="#Step_12:_Task_Termination"><span class="tocnumber">13</span> <span class="toctext">Step 12: Task Termination</span></a></li>
+<li class="toclevel-1 tocsection-16"><a href="#Step_13:_Mutexes_and_Semaphores"><span class="tocnumber">14</span> <span class="toctext">Step 13: Mutexes and Semaphores</span></a></li>
+<li class="toclevel-1 tocsection-17"><a href="#Step_14:_Inter-process_Communication_.28IPC.29"><span class="tocnumber">15</span> <span class="toctext">Step 14: Inter-process Communication (IPC)</span></a></li>
+<li class="toclevel-1 tocsection-18"><a href="#Step_15:_.22Schedule.28.29.22_Version_3"><span class="tocnumber">16</span> <span class="toctext">Step 15: "Schedule()" Version 3</span></a></li>
+<li class="toclevel-1 tocsection-19"><a href="#Adding_User-Space_Support"><span class="tocnumber">17</span> <span class="toctext">Adding User-Space Support</span></a></li>
+<li class="toclevel-1 tocsection-20"><a href="#Adding_FPU.2FMMX.2FSSE.2FAVX_Support_.2880x86_only.29"><span class="tocnumber">18</span> <span class="toctext">Adding FPU/MMX/SSE/AVX Support (80x86 only)</span></a></li>
+</ul>
+</td></tr></tbody></table>
+<h2> <span class="mw-headline" id="Overview">Overview</span></h2>
+<p>This tutorial will describe a way to implement multi-tasking and task
+ switching for a kernel that uses "kernel stack per task". It has been 
+designed to allow the reader to implement a full featured scheduler 
+(while avoiding common pitfalls) in steps that can be tested before 
+moving on to the next step.
+</p><p>Note: I use the word "task" as generic term to mean "the thing 
+that a scheduler schedules". For operating systems that don't support 
+multi-threading, a task might be a process. For operating systems that 
+do support multi-threading a task would be a thread.
+</p>
+<h2> <span class="mw-headline" id="Step_1:_Initialization_and_.22Switch_to_task.28.29.22">Step 1: Initialization and "Switch_to_task()"</span></h2>
+<p>Start by creating some kind of data structure that will keep track of
+ a task's information. Typically this is called a "process control 
+block" or "thread control block". At a minimum, this structure needs to 
+contain:
+</p>
+<ul><li> a field for the task's kernel stack top
+</li><li> a field for the task's virtual address space (e.g. the value for CR3 on 80x86 systems)
+</li><li> a generic "next task" field that can be used for multiple different linked lists of tasks later on
+</li><li> a "state" field (also to be used later)
+</li></ul>
+<p>It might also contain other/optional fields, like:
+</p>
+<ul><li> the scheduling policy of the task
+</li><li> the scheduling priority of the task
+</li><li> the ID of the process the task/thread belongs to
+</li><li> a "task name" string
+</li><li> the amount of CPU time the task has consumed so far
+</li></ul>
+<p>Don't forget that you can come back and add fields to this structure 
+whenever you like - you don't need to have everything initially.
+</p><p>Once you've created an initial data structure for keeping track 
+of a task's information; create an "initialise_multitasking()" function.
+ The idea here (initially) is that there's already a task that has been 
+running since boot, and you only need to create the information for it 
+by allocating some memory for the task's information structure that you 
+just created and setting the fields in that structure as appropriate.
+</p><p>Next; write a low-level function to switch from one task (that is
+ assumed to be running kernel code) to another task (that is also 
+assumed to be running kernel code).
+</p><p>Note that the low-level task switch code should be written in 
+pure assembly. If it's written in inline assembly in the middle of a C 
+function then the compiler may add its own "function prologue" and 
+"function epilogue" code that changes the layout of the stack. This is 
+important because when a new task is being created the kernel needs to 
+put values on the new task's kernel stack to match the values that the 
+"switch_to_task" expects to pop off of the new task's stack.
+</p><p>For example (NASM syntax, 32-bit 80x86, "cdecl" calling 
+convention, single-CPU only/globals used for "per CPU" variables, no 
+support for FPU/MMX/SSE/AVX, untested):
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="asm source-asm"><pre class="de1"><span class="co1">;C declaration:</span>
+<span class="co1">;   void switch_to_task(thread_control_block *next_thread);</span>
+<span class="co1">;</span>
+<span class="co1">;WARNING: Caller is expected to disable IRQs before calling, and enable IRQs again after function returns</span>
+&nbsp;
+switch_to_task<span class="sy0">:</span>
+&nbsp;
+    <span class="co1">;Save previous task's state</span>
+&nbsp;
+    <span class="co1">;Notes:</span>
+    <span class="co1">;  For cdecl; EAX, ECX, and EDX are already saved by the caller and don't need to be saved again</span>
+    <span class="co1">;  EIP is already saved on the stack by the caller's "CALL" instruction</span>
+    <span class="co1">;  The task isn't able to change CR3 so it doesn't need to be saved</span>
+    <span class="co1">;  Segment registers are constants (while running kernel code) so they don't need to be saved</span>
+&nbsp;
+    <span class="kw1">push</span> <span class="kw3">ebx</span>
+    <span class="kw1">push</span> <span class="kw3">esi</span>
+    <span class="kw1">push</span> <span class="kw3">edi</span>
+    <span class="kw1">push</span> <span class="kw3">ebp</span>
+&nbsp;
+    <span class="kw1">mov</span> <span class="kw3">edi</span><span class="sy0">,</span><span class="br0">[</span>current_task_TCB<span class="br0">]</span>    <span class="co1">;edi = address of the previous task's "thread control block"</span>
+    <span class="kw1">mov</span> <span class="br0">[</span><span class="kw3">edi</span><span class="sy0">+</span>TCB<span class="sy0">.</span><span class="kw3">ESP</span><span class="br0">]</span><span class="sy0">,</span><span class="kw3">esp</span>         <span class="co1">;Save ESP for previous task's kernel stack in the thread's TCB</span>
+&nbsp;
+    <span class="co1">;Load next task's state</span>
+&nbsp;
+    <span class="kw1">mov</span> <span class="kw3">esi</span><span class="sy0">,</span><span class="br0">[</span><span class="kw3">esp</span><span class="sy0">+</span><span class="br0">(</span><span class="nu0">4</span><span class="sy0">+</span><span class="nu0">1</span><span class="br0">)</span><span class="sy0">*</span><span class="nu0">4</span><span class="br0">]</span>         <span class="co1">;esi = address of the next task's "thread control block" (parameter passed on stack)</span>
+    <span class="kw1">mov</span> <span class="br0">[</span>current_task_TCB<span class="br0">]</span><span class="sy0">,</span><span class="kw3">esi</span>    <span class="co1">;Current task's TCB is the next task TCB</span>
+&nbsp;
+    <span class="kw1">mov</span> <span class="kw3">esp</span><span class="sy0">,</span><span class="br0">[</span><span class="kw3">esi</span><span class="sy0">+</span>TCB<span class="sy0">.</span><span class="kw3">ESP</span><span class="br0">]</span>         <span class="co1">;Load ESP for next task's kernel stack from the thread's TCB</span>
+    <span class="kw1">mov</span> <span class="kw3">eax</span><span class="sy0">,</span><span class="br0">[</span><span class="kw3">esi</span><span class="sy0">+</span>TCB<span class="sy0">.</span><span class="kw3">CR3</span><span class="br0">]</span>         <span class="co1">;eax = address of page directory for next task</span>
+    <span class="kw1">mov</span> <span class="kw3">ebx</span><span class="sy0">,</span><span class="br0">[</span><span class="kw3">esi</span><span class="sy0">+</span>TCB<span class="sy0">.</span>ESP0<span class="br0">]</span>        <span class="co1">;ebx = address for the top of the next task's kernel stack</span>
+    <span class="kw1">mov</span> <span class="br0">[</span>TSS<span class="sy0">.</span>ESP0<span class="br0">]</span><span class="sy0">,</span><span class="kw3">ebx</span>            <span class="co1">;Adjust the ESP0 field in the TSS (used by CPU for for CPL=3 -&gt; CPL=0 privilege level changes)</span>
+    <span class="kw1">mov</span> <span class="kw3">ecx</span><span class="sy0">,</span><span class="kw3">cr3</span>                   <span class="co1">;ecx = previous task's virtual address space</span>
+&nbsp;
+    <span class="kw1">cmp</span> <span class="kw3">eax</span><span class="sy0">,</span><span class="kw3">ecx</span>                   <span class="co1">;Does the virtual address space need to being changed?</span>
+    <span class="kw1">je</span> <span class="sy0">.</span>doneVAS                   <span class="co1">; no, virtual address space is the same, so don't reload it and cause TLB flushes</span>
+    <span class="kw1">mov</span> <span class="kw3">cr3</span><span class="sy0">,</span><span class="kw3">eax</span>                   <span class="co1">; yes, load the next task's virtual address space</span>
+<span class="sy0">.</span>doneVAS<span class="sy0">:</span>
+&nbsp;
+    <span class="kw1">pop</span> <span class="kw3">ebp</span>
+    <span class="kw1">pop</span> <span class="kw3">edi</span>
+    <span class="kw1">pop</span> <span class="kw3">esi</span>
+    <span class="kw1">pop</span> <span class="kw3">ebx</span>
+&nbsp;
+    <span class="kw1">ret</span>                           <span class="co1">;Load next task's EIP from its kernel stack</span></pre></div></div>
+<p>Next; write a function to create a new kernel task. This is a little 
+bit like the code you already wrote for "initialise_multitasking()" 
+(because it would allocate some memory for the structure used to keep 
+track of the task's information and fill it in); except that you will 
+need to allocate a new kernel stack for the new task and put values on 
+the new kernel stack to match the values that your 
+"switch_to_task(task)" function expects to pop off the stack after 
+switching to the task. Don't forget that the values on the new kernel 
+stack will include a "return EIP" (the address that the 
+"switch_to_task(task)" function will return to), which should come from 
+an input parameter of the "create_kernel_task()" function (e.g. like 
+"create_kernel_task(void * startingEIP)" except probably with a function
+ pointer instead of a void pointer if you can remember the correct 
+syntax for that).
+</p><p>Note that you can have a "task start up function" that is 
+executed when a new task first gets CPU time and does a few 
+initialisation things and then passes control to the task's normal code.
+ In this case the new kernel stack will include a "return EIP" that 
+contains the address of the "task start up function", plus an extra 
+"return EIP" (for when the "task start up function" returns) that 
+contains the address of the task itself (taken from an input parameter 
+of the "create_kernel_task()" function). This is a little slower, but 
+avoids the need for each task's code to do any initialisation itself.
+</p><p>Finally; test everything you've done for this step by creating a 
+second kernel task; where the existing first kernel task has loop that 
+uses "switch_to_task()" to switch to the new second kernel task, and the
+ new second task has a loop that does "switch_to_task" to switch to the 
+existing first task. If everything works well you'll end up with two 
+tasks that constantly switch to each other. If you like you can do more 
+testing (e.g. have lots of tasks where one task switches to the next and
+ the last task switches back to the first). It's also fun to see out how
+ many task switches per second your code is capable of.
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Step_2:_.22Schedule.28.29.22_Version_1">Step 2: "Schedule()" Version 1</span></h2>
+<p>Having tasks that explicitly switch to each other is a little 
+inconvenient, and it'd be nice if the kernel could automatically select a
+ task to switch to next, so the next step is to write a function that 
+does this.
+</p><p>``Note: If you're confident in your abilities you might be 
+tempted to skip this step and go directly to "Step 4: "Schedule()" 
+version 2" below; but this step is so simple that skipping it won't save
+ much time and it's probably better to get a little experience with 
+"extremely simple" before moving on to "very simple".``
+</p><p>The code to select which task to give CPU time to next has a huge
+ effect on the nature and "feel" of the OS; and it's possible for this 
+code to become very complicated for this reason. However, it's better to
+ start simple ("learn to walk before you run") so we're going to start 
+with the simplest (and most awful) code possible. More specifically, 
+we're going to start with a cooperative round robin scheduler; and then 
+(later on) we're going to replace it with something a little more 
+complex (that is a lot less awful).
+</p><p><i>Note: Round robin is awful because when the OS is under heavy 
+load and something happens you need to wait for all of those tasks to 
+use the CPU before the OS can respond. For example, if there are 1234 
+tasks running and each one uses an average of 5 ms of CPU time, and the 
+user presses a key; then it will take over 6 seconds for the task that 
+responds to the key press to get CPU time and the user will not be 
+impressed with how laggy your OS is. Some people try to fix this problem
+ by putting tasks that are unblocked at the start of the list, but that 
+doesn't work well because a task can deliberately "block then unblock" 
+to keep itself at the start of the list and hog all of the CPU time 
+while preventing other tasks from getting any CPU time.</i>
+</p><p>To implement a round robin scheduler, you mostly only need a 
+circular linked list. For a circular linked list, each item in the list 
+points to the next item in the list, and the last item in the list 
+points back to the first item in the list. In other words, we just need a
+ "next task" field to implement it; and when we created the data 
+structure to keep track of a task's information we already included a 
+field that can be used for this purpose.
+</p><p>Essentially; you just need to set the "next_task" field in the 
+data structure for each task's information in both the code to 
+initialise multi-tasking and the code to create a new task.
+</p><p>Once that's done, you can write a "schedule()" function that 
+selects a task to switch to and then switches to the selected task. You 
+only need single line of code to select the next task, like 
+"selected_task = current_task_TCB-&gt;next_task;" and you already have a
+ function to switch to a specific task; and both of these things can be 
+combined. In other words, the "Schedule()" function can contain a single
+ line of code like "switch_to_task(current_task_TCB-&gt;next_task);".
+</p><p>As soon as you've finished implementing "schedule()" you can test
+ it using the kernel tasks you were using for testing earlier, just by 
+replacing the calls to "switch_to_task()" with calls to "schedule()". If
+ you had multiple additional kernel tasks with different code for each 
+kernel task (so it could switch to the right next task) you can also 
+delete the duplicates so that you end up with multiple additional kernel
+ tasks executing the same code.
+</p>
+<h2> <span class="mw-headline" id="Step_3:_Time_Accounting_.28Optional.29">Step 3: Time Accounting (Optional)</span></h2>
+<p>Sooner or later you'll probably want to keep track of things like the
+ total amount of CPU time each task has consumed (which can be used for 
+things like calculating the average CPU load for each task, average time
+ spent idle, etc).
+</p><p><i>Note: A timer is something that either generates an IRQ after a
+ requested amount of time has passed, or generates an IRQ at a specific 
+frequency. A counter is something that keeps a count that can be read 
+whenever you like. A timer may not be a counter (it might not have a 
+"current count" that you can read), and a counter may not be a timer (it
+ might not be able to generate an IRQ).</i>
+</p><p>To do this you'll need some kind of time counter, like the CPU's 
+time stamp counter, HPET's main counter or ACPI's counter. If the 
+computer is too old to have an actual counter you may need to implement 
+one yourself using a timer (e.g. by configuring a timer to generate an 
+IRQ at a specific frequency and then doing something like 
+"ticks_since_boot++;" in the timer's IRQ handler).
+</p><p>For time accounting, when certain things happen you want to 
+subtract the counter's current value from the value it had last time (to
+ determine how much time elapsed since last time); then add the time 
+elapsed to the amount of time that the current task has consumed and 
+update the time the counter was read last, a little bit like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> update_time_used<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    current_count <span class="sy0">=</span> read_counter<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    elapsed <span class="sy0">=</span> last_count <span class="sy0">-</span> current_count<span class="sy0">;</span>
+    last_count <span class="sy0">=</span> current_count<span class="sy0">;</span>
+    current_task_TCB<span class="sy0">-&gt;</span>time_used <span class="sy0">+=</span> elapsed<span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>The first place this needs to be called is during task switches, to 
+update the amount of time that the previously running task consumed 
+before switching to the next task. For extra goodness 
+"update_time_used()" can also be called when someone asks the kernel how
+ much time a task has consumed, so that (e.g.) if a task has been 
+running for 10 ms already then that 10 ms is included in the time a task
+ has consumed.
+</p><p>The other place you might want to update the amount of time a 
+task has consumed is immediately after the CPU changes from user-space 
+code to kernel code and immediately before the CPU changes from kernel 
+code to user-space code; so that you can keep track of "amount of time 
+task spent running kernel code" and "amount of time task spent running 
+user-space code" separately.
+</p><p><i>Note that it's a good idea to make the time accounting a 
+little abstract and use a relatively high precision. For example, rather
+ than just doing "current_task_TCB-&gt;time_used += elapsed;" you might 
+convert "elapsed" into nanoseconds. That way (regardless of what kind of
+ counter the computer supports and/or if you add support for more modern
+ counters later) the time accounting will always use the same time 
+scale.</i>
+</p><p>Finally; test to make sure that your scheduler is keeping track of the time each task consumes correctly.
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Step_4:_Task_States_and_.22Schedule.28.29.22_Version_2">Step 4: Task States and "Schedule()" Version 2</span></h2>
+<p>For a real OS (regardless of which scheduling algorithm/s the 
+scheduler uses) most tasks switches are caused because the currently 
+running task has to wait for something to happen (data received from a 
+different task or storage devices/file system or network, or time to 
+pass, or for user to press a key or move the mouse, or for a mutex to 
+become available, etc), or happen because something that a task was 
+waiting for happened causing a  task to unblock and preempt the 
+currently running task.
+</p><p>To prepare for this, we want to add some kind of "state" to each 
+task so that it's easy to see what a task is doing (e.g. if it's waiting
+ and what it's waiting for).
+</p><p>For task's that aren't waiting; I find it easier (later, when you
+ add support for blocking and unblocking tasks) to have a "running" 
+state (when the task is currently using the CPU) and a separate "ready 
+to run" state. The idea is that when a task is given CPU time it is 
+removed from the scheduler's list of "ready to run" tasks and its state 
+is changed from "ready to run" to "running"; and when a task stops using
+ CPU time either it's state is changed back to "ready to run" and it is 
+put back on the scheduler's list of "ready to run" tasks, or its state 
+is changed to "waiting for something" and it is not put back on the 
+scheduler's list of "ready to run" tasks.
+</p><p>Note that making this change will involve changing the 
+scheduler's list of tasks from a circular linked list into a 
+"non-circular" linked list; and (because we've been using a singly 
+linked list and have been using the "current_task_TCB" variable as a 
+temporary "start of linked list" variable) you will need to add two new 
+global variables - one for the start of the linked list and one for the 
+end of the linked list. Initially both of these variables will be NULL 
+because there's no tasks on the list, when the first task is added both 
+of the variables will be set to the first task's information (when there
+ is only one task on the list it must be the first and last task), and 
+when more tasks are added they just get appended to the list (like 
+"last_task-&gt;next_task = new_task; last_task = new_task;").
+</p><p>After creating the new "first and last task on the scheduler's 
+ready to run list" variables; update the function that initialises 
+multi-tasking so that it sets the initial task's state to "running" (and
+ delete any older code that put the initial task on the scheduler's list
+ of tasks); and then update the code that creates new kernel tasks so 
+that the new task's state is set to "ready to run" just before the new 
+task is added to the scheduler's "ready to run" list.
+</p><p>The next change is to update the low-level "switch_to_task()" 
+function, so that if and only if the previously running task is still in
+ the "running" state the previously running task's state is changed from
+ "running" to "ready to run" and the previously running task is put back
+ on the scheduler's list of "ready to run" tasks; and then set the state
+ of the next task to be given CPU time to "running" (regardless of what 
+state it was in before, and without removing it from any list).
+</p><p>Finally; the "schedule()" function needs to be changed so that it
+ removes the task from the "ready to run" list before doing a task 
+switch, making it something like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> schedule<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">if</span><span class="br0">(</span> first_ready_to_run_task <span class="sy0">!=</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        thread_control_block <span class="sy0">*</span> task <span class="sy0">=</span> first_ready_to_run_task<span class="sy0">;</span>
+        first_ready_to_run_task <span class="sy0">=</span> task<span class="sy0">-&gt;</span>next<span class="sy0">;</span>
+        switch_to_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+<span class="br0">}</span></pre></div></div>
+<p>Note that if there's only one task you don't really want to do any 
+task switches (because there's no other tasks to switch to), and in this
+ case the task will be "running" and the list of "ready to run" tasks 
+will be empty. The previous version of "schedule()" was a little less 
+efficient (it would've done a task switch from one task to the same 
+task).
+</p>
+<h2> <span class="mw-headline" id="Step_5:_Race_Conditions_and_Locking_Version_1">Step 5: Race Conditions and Locking Version 1</span></h2>
+<p>So far we haven't had to care about things like race conditions and 
+locking because its a cooperative scheduler and there's only one CPU. 
+However, before the scheduler's code can progress much further we're 
+going to need some way to avoid race conditions and ensure everything 
+happens in a correct order.
+</p><p>When there's a single CPU, in theory, this can be done just by 
+disabling IRQs in places that matter. For multiple CPUs this doesn't 
+work (e.g. disabling IRQs on one CPU won't stop a different CPU from 
+modifying the scheduler's list of "ready to run" threads at an 
+unfortunate time) and you need something more robust (e.g. spinlock).
+</p><p>We won't be implementing support for multiple CPUs; but that 
+doesn't mean we can't (and shouldn't) make it a little easier to add 
+support for multiple CPUs much much later. For this reason I'm going to 
+pretend that there's a "big scheduler lock" and implement functions to 
+acquire and release this lock, but then I'm not going to actually have a
+ lock and I'm just going to disable and enable IRQs instead.
+</p><p>Unfortunately there's a minor problem - what if IRQs are already 
+disabled for some other reason? For assembly language this isn't a 
+problem - you can PUSHFD to save the original flags and disable IRQs 
+when you enter a critical section, and then POPFD the original flags 
+when you leave the critical section. For higher level languages you 
+can't just leave stuff on the stack like this because the compiler will 
+get horribly confused and think that local variables are in the wrong 
+places, etc.
+</p><p>To work around that problem, there's two alternatives - have a 
+function that returns the old EFLAGS as an output parameter and disables
+ IRQs, then another function that restores the old EFLAGS from an input 
+parameter, where the caller has to store the old EFLAGS value somewhere 
+itself. The other alternative is to keep a counter that keeps track of 
+how many pieces of code have wanted IRQs disabled, where you'd increment
+ the counter when disabling IRQs at the start of a critical section, and
+ decrement the counter and only enable IRQs if the counter is zero at 
+the end of a critical section.
+</p><p>The first option is probably more efficient; but we don't really 
+care much about getting the highest performance possible at this stage, 
+and because I want to make it look a little bit like a lock (to make it 
+easier to support multiple CPUs later) I'm going to use the second 
+option. It might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">int</span> IRQ_disable_counter <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw4">void</span> lock_scheduler<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+<span class="co2">#ifndef SMP</span>
+    CLI<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    IRQ_disable_counter<span class="sy0">++;</span>
+<span class="co2">#endif</span>
+<span class="br0">}</span>
+&nbsp;
+<span class="kw4">void</span> unlock_scheduler<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+<span class="co2">#ifndef SMP</span>
+    IRQ_disable_counter<span class="sy0">--;</span>
+    <span class="kw1">if</span><span class="br0">(</span>IRQ_disable_counter <span class="sy0">==</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+        STI<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+<span class="co2">#endif</span>
+<span class="br0">}</span></pre></div></div>
+<p>Once that's done, you need to add a comment to your "schedule()" 
+function and to your "switch_to_task()" function saying that the caller 
+is responsible for making sure the scheduler is locked before calling.
+</p><p>Then you need to comply with the new comment by locking and 
+unlocking the scheduler at the right places. Fortunately you only have a
+ few kernel tasks that call "schedule()" directly; so you only need to 
+add locking/unlocking to them. The end result might look a little like 
+this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> test_kernel_task<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="co1">// unlock_scheduler();</span>
+&nbsp;
+    <span class="kw1">for</span><span class="br0">(</span><span class="sy0">;;</span><span class="br0">)</span> <span class="br0">{</span>
+        lock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+        schedule<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+        unlock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+<span class="br0">}</span></pre></div></div>
+<p>This can be a little confusing depending on your perspective. From 
+the perspective of one task, it locks the scheduler, does a task switch,
+ and then when it gets CPU time again it unlocks the scheduler; and this
+ is fine (the scheduler is always unlocked after its locked). From the 
+perspective of the CPU, one task locks the scheduler then the scheduler 
+does a task switch and a completely different task unlocks the 
+scheduler; and this is also fine (the scheduler is still unlocked after 
+its locked).
+</p><p>Note that "one task locks the scheduler then the scheduler does a
+ task switch and a completely different task unlocks the scheduler" 
+means that one of the first things that a new task will need to do (when
+ it gets CPU time) is unlock the scheduler's lock. If you decided to use
+ a "task start up function" in Step 1, then the "task start up function"
+ can unlock the schedulers lock before returning to the task's code, and
+ if you decided not to do that then you'll need to have an 
+"unlock_scheduler();" at the start of every kernel task.
+</p><p>Finally, you should test to make sure your multi-tasking still works the same.
+</p>
+<h2> <span class="mw-headline" id="Step_6:_Blocking_and_Unblocking_Tasks">Step 6: Blocking and Unblocking Tasks</span></h2>
+<p>When the currently running task blocks, the kernel will put the task 
+on some other list or structure (e.g. a list of tasks that called 
+"sleep()" and are waiting to be woken up, a list of tasks waiting to 
+acquire a mutex, etc) and change the task's state to "blocked for 
+whatever reason". When a task in unblocked it will be removed from 
+whatever list or structure it was on, and either its state will be 
+changed to "ready to run" and it'll be put back on the scheduler's 
+"ready to run" list, or it's state will be changed to "running" and it 
+won't be put on any list.
+</p><p>Rather than duplicating this logic in all of the places that 
+block and unblock tasks; it's nice for the scheduler to provide 
+functions that can be used for blocking and unblocking tasks.
+</p><p>Blocking a task is incredibly easy (mostly because we prepared 
+for it in the last step by making sure a task in the "running" state is 
+not on the scheduler's "ready to run" list). You only need to set the 
+task's state and then find another task to run, which might look a 
+little like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> block_task<span class="br0">(</span><span class="kw4">int</span> reason<span class="br0">)</span> <span class="br0">{</span>
+    lock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    current_task_TCB<span class="sy0">-&gt;</span>state <span class="sy0">=</span> reason<span class="sy0">;</span>
+    schedule<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    unlock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>Unblocking a task is a little more involved. The first step is to 
+decide if the task being unblocked should (or shouldn't) preempt the 
+currently running task. For now (because we don't have any fancy task 
+priorities or anything) we could never preempt, or we could only preempt
+ if there was only one running task (because it's likely that if there 
+was only one running task that task has been able to use lots of CPU 
+time anyway). For fun (and because it helps to show how preemption would
+ work) I'm going to go with the latter option.
+</p><p>If the scheduler decides that no preemption happens, it just sets
+ the unblocked task's state to "ready to run" and puts the task on the 
+scheduler's "ready to run" list.
+</p><p>If the scheduler decides that preemption will happen, it just 
+calls "switch_to_task()" to switch immediately to the unblocked task.
+</p><p>The code might look something like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> unblock_task<span class="br0">(</span>thread_control_block <span class="sy0">*</span> task<span class="br0">)</span> <span class="br0">{</span>
+    lock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw1">if</span><span class="br0">(</span>first_ready_to_run_task <span class="sy0">==</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+&nbsp;
+        <span class="co1">// Only one task was running before, so pre-empt</span>
+&nbsp;
+        switch_to_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+        <span class="co1">// There's at least one task on the "ready to run" queue already, so don't pre-empt</span>
+&nbsp;
+        last_ready_to_run_task<span class="sy0">-&gt;</span>next <span class="sy0">=</span> task<span class="sy0">;</span>
+        last_ready_to_run_task <span class="sy0">=</span> task<span class="sy0">;</span>
+    <span class="br0">}</span>
+    unlock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>The other thing we'll need is a reason to block a task. For this, we 
+can add the ability for a task to voluntarily pause itself until some 
+other task un-pauses it, which is something that might be useful later. 
+To implement this we only need to define a new task state (PAUSED).
+</p><p>Finally, you can test the blocking and unblocking by having one 
+of the kernel tasks pause itself (e.g. "block_task(PAUSED);"), and then 
+get the next kernel task that will be given CPU time to unpause the task
+ that paused itself. Note that you will need to be a little careful here
+ because you don't want to unpause the task before it pauses itself, but
+ we're still using a cooperative round robin scheduler so it's easy to 
+determine which order tasks will be given CPU time and avoid that 
+problem.
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Step_7:_.22Sleep.28.29.22.2C_.22Nano_sleep.28.29.22_and_.22Nano_sleep_until.28.29.22">Step 7: "Sleep()", "Nano_sleep()" and "Nano_sleep_until()"</span></h2>
+<p>Sometimes a task wants to wait for time to pass (e.g. maybe a text 
+editor wants to create a backup of your unsaved work every 15 minutes, 
+so it has a task that sleeps for 15 minutes and saves your work when it 
+wakes up). Sometimes a task wants to wait for a very small amount of 
+time to pass (e.g. maybe a device driver needs to reset its device and 
+then wait for 20 milliseconds). For both of these cases you want to 
+block the task so that it doesn't waste any CPU time, and then have a 
+timer IRQ unblock the task when the requested amount of time has passed.
+</p><p>Of course it's impossible to guarantee that a task will be 
+blocked for exactly the amount of time it requested; and even if it is 
+possible there's no guarantee that the scheduler would give the task CPU
+ time as soon as it's unblocked. The only guarantee that can be made is 
+that the task will not be unblocked too early, and an OS should provide 
+this guarantee (and should warn programmers that their task may be 
+unblocked later than they wanted).
+</p><p>Sometimes a task wants to do something regularly (e.g. maybe it's
+ displaying an animated icon and needs to update the icon every 250 ms).
+ For this, using something like "nano_sleep()" doesn't work properly. If
+ you have a loop that updates the icon then waits for 250 ms; what 
+happens is that it takes a little time to update the icon and the OS 
+doesn't guarantee you'll be blocked for exactly 250 ms (and CPU time 
+used by other tasks will make the delay erratic), so the icon might be 
+updated after 300 ms the first time, then after 600 ms the next time, an
+ so on; and on average it might be updated every 500 ms. There's no way 
+to fix this problem using something like "nano_sleep()" because it uses 
+relative time (e.g. "250 ms from now").
+</p><p>To fix the problem you need a function that uses absolute time 
+instead of relative time (e.g. "sleep until time since boot is &gt;= 
+123456"). This might look a little like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1">    delay <span class="sy0">=</span> <span class="nu0">250000000</span><span class="sy0">;</span>   <span class="co1">// 250000000 nanoseconds is 250 milliseconds</span>
+    next_update <span class="sy0">=</span> get_time_since_boot<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw1">for</span><span class="br0">(</span><span class="sy0">;;</span><span class="br0">)</span> <span class="br0">{</span>
+        do_something<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+        next_update <span class="sy0">+=</span> delay<span class="sy0">;</span>
+        nano_sleep_until<span class="br0">(</span>next_update<span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span></pre></div></div>
+<p>For code like this, the time between calls to "do_something()" still 
+varies, but if its possible to call "do_something" often enough you can 
+guarantee that these variations will average out and that 
+"do_something()" will be called every 250 ms on average. Of course if 
+there's a design flaw and "do_something()" takes too long (e.g. longer 
+than 250 ms), or if there's so many other tasks consuming CPU time that 
+this task can't keep up (which is a problem that can be fixed with task 
+priorities that we don't have yet), then it isn't possible to call 
+"do_something" often enough - if that happens, the 
+"nano_sleep_until(next_update);" will do nothing (no delay at all) and 
+"do_something()" will be called as often as possible, which is still the
+ best behaviour anyone can expect in those conditions.
+</p><p>Fortunately, if you have "nano_sleep_until()" then you can use it to implement "nano_sleep()", like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> nano_sleep<span class="br0">(</span><span class="kw4">uint64_t</span> nanoseconds<span class="br0">)</span> <span class="br0">{</span>
+    nano_sleep_until<span class="br0">(</span>get_time_since_boot<span class="br0">(</span><span class="br0">)</span> <span class="sy0">+</span> nanoseconds<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>In a similar way, if you have either "nano_sleep_until()" or 
+"nano_sleep()" you can use them to implement "sleep()" - you only need 
+to multiply seconds by 1000000000 to get nanoseconds.
+</p><p>What this means is that "nano_sleep_until()" is the only function that the scheduler really needs to care about.
+</p><p>To implement "nano_sleep_until()"; the general idea is to put the
+ task onto a list of sleeping tasks and block the task; and then have 
+some sort of timer (not a time counter like we used earlier, but a timer
+ that has an IRQ) to check the list of tasks and unblock any tasks that 
+need to be woken up.
+</p><p>The problem here is that the timer's IRQ handler might need to 
+wake up several tasks at the same time, and as soon as it wakes up one 
+task the scheduler might decide to do a task switch; and that task 
+switch will make it impossible for the timer IRQ handler to wake up the 
+other tasks at the right time. We need to fix that problem before 
+implementing "nano_sleep_until()".
+</p><p>Of course this problem will happen on other places too (e.g. 
+multiple tasks waiting for the same data from disk being unblocked at 
+the same time, multiple tasks waiting for a "pthread_cond_broadcast()", 
+etc). We want a generic solution that solves the problem everywhere, not
+ just a hack for "nano_sleep_until()".
+</p><p>What we really want is a way to tell the scheduler to postpone 
+any task switches until we're ready. More specifically, we want a way to
+ tell the scheduler to postpone task switches while the kernel is 
+holding any lock (and do the postponed task switch/es when we aren't 
+holding a lock any more), and we want to do this for all locks including
+ the scheduler's lock.
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Step_8:_Locking_Version_2">Step 8: Locking Version 2</span></h2>
+<p>To tell the scheduler to postpone task switches while we're holding 
+one lock, you just need a "postpone task switches" flag. However, what 
+if locks are nested (e.g. where you acquire two different locks, and 
+then release one, then release the other)? To make it work for nested 
+locks you need a counter to keep track of how many locks the CPU is 
+currently holding.
+</p><p>Essentially; when you acquire a lock you increase the counter, 
+and when you release the lock you decrease the counter; and task 
+switches are postponed whenever the counter is non-zero.
+</p><p>So, how do you postpone task switches?
+</p><p>This is relatively easy - before doing a task switch (in both 
+"schedule()" and "switch_to_task()") the scheduler checks if task 
+switches are being postponed (by checking if the counter is zero or 
+non-zero); and if task switches are being postponed (counter is 
+non-zero) the scheduler sets a "task switch was postponed" flag and 
+doesn't do the task switch at all. Then, when a lock is released you 
+decrement the counter and see if the counter became zero; and if the 
+counter did become zero you check if the scheduler set the "task switch 
+was postponed" flag, and if it was you clear it and ask the scheduler to
+ do the postponed task switch by calling "schedule()" again.
+</p><p>We already have code for locking and unlocking the scheduler; but
+ you can't really use the same lock that the scheduler uses because you 
+don't want the scheduler to disable task switching every time it needs 
+to do a task switch, so we're going to have a different lock for 
+miscellaneous stuff instead. Ideally you'd have many locks, but that's 
+overkill for a tutorial. Of course we still won't be adding support for 
+multiple CPUs and we'll still be enabling/disabling IRQs instead of 
+having an actual lock. 
+</p><p>It might look a little like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">int</span> postpone_task_switches_counter <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="kw4">int</span> task_switches_postponed_flag <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw4">void</span> lock_stuff<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+<span class="co2">#ifndef SMP</span>
+    CLI<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    IRQ_disable_counter<span class="sy0">++;</span>
+    postpone_task_switches_counter<span class="sy0">++;</span>
+<span class="co2">#endif</span>
+<span class="br0">}</span>
+&nbsp;
+<span class="kw4">void</span> unlock_stuff<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+<span class="co2">#ifndef SMP</span>
+    postpone_task_switches_counter<span class="sy0">--;</span>
+    <span class="kw1">if</span><span class="br0">(</span>postpone_task_switches_counter <span class="sy0">==</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+        <span class="kw1">if</span><span class="br0">(</span>task_switches_postponed_flag <span class="sy0">!=</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+            task_switches_postponed_flag <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+            schedule<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+        <span class="br0">}</span>
+    <span class="br0">}</span>
+    IRQ_disable_counter<span class="sy0">--;</span>
+    <span class="kw1">if</span><span class="br0">(</span>IRQ_disable_counter <span class="sy0">==</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+        STI<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+<span class="co2">#endif</span>
+<span class="br0">}</span></pre></div></div>
+<p>The "schedule()" function only needs a few lines to check 
+"postpone_task_switches_counter" and set "task_switches_postponed_flag",
+ and that might end up a looking like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> schedule<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">if</span><span class="br0">(</span>postpone_task_switches_counter <span class="sy0">!=</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+        task_switches_postponed_flag <span class="sy0">=</span> <span class="nu0">1</span><span class="sy0">;</span>
+        <span class="kw1">return</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+    <span class="kw1">if</span><span class="br0">(</span> first_ready_to_run_task <span class="sy0">!=</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        thread_control_block <span class="sy0">*</span> task <span class="sy0">=</span> first_ready_to_run_task<span class="sy0">;</span>
+        first_ready_to_run_task <span class="sy0">=</span> task<span class="sy0">-&gt;</span>next<span class="sy0">;</span>
+        switch_to_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+<span class="br0">}</span></pre></div></div>
+<p>You'd need to make the same little change at the start of the 
+"switch_to_task()" function, but that's "architecture specific 
+assembly". For 32-bit 80x86 it might just a few instructions inserted at
+ the start of the function (before all other instructions), like:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="asm source-asm"><pre class="de1">    <span class="kw1">cmp</span> <span class="kw5">dword</span> <span class="br0">[</span>postpone_task_switches_counter<span class="br0">]</span><span class="sy0">,</span><span class="nu0">0</span>
+    <span class="kw1">je</span> <span class="sy0">.</span><span class="kw4">continue</span>
+    <span class="kw1">mov</span> <span class="kw5">dword</span> <span class="br0">[</span>task_switches_postponed_flag<span class="br0">]</span><span class="sy0">,</span><span class="nu0">1</span>
+    <span class="kw1">ret</span>
+&nbsp;
+<span class="sy0">.</span><span class="kw4">continue</span><span class="sy0">:</span></pre></div></div>
+<p>Of course if you wanted to you could have a high level language 
+wrapper that does this before calling the low level assembly function - 
+either way is fine (I don't like wrappers much, but if you care about 
+portability a wrapper would mean there's a little less code to change 
+when porting).
+</p><p>Finally, test the code to make sure it still works!
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Step_9:_.22Nano_sleep_until.28.29.22_Again">Step 9: "Nano_sleep_until()" Again</span></h2>
+<p>Now that we've improved locking, we can acquire a lock (e.g. the 
+scheduler's lock) and wake up lots of sleeping tasks with caring if that
+ will or won't cause task switches (or if a task we unblock preempts the
+ task we're using), and then simply release the lock; so we're ready to 
+implement "nano_sleep_until()".
+</p><p>To start with we're going to need some kind of structure to keep 
+track of sleeping tasks. Good ways to do this are complicated (e.g. 
+"time buckets") and we don't want complicated, so let's use an unsorted 
+linked list (which isn't great because we'll need to check every task on
+ the list, but it will work and it can be replaced with something more 
+complicated later).
+</p><p>The other thing I should explain is that there's two very 
+different ways of using a timer. The easiest way is to use a timer that 
+generates an IRQ at a fixed frequency. A much better way is to determine
+ how long until the timer IRQ is needed next and then configure the 
+timer to generate an IRQ at that time; because this gives you a lot less
+ unnecessary IRQs and also gives you a lot better precision.
+</p><p>I'm going to use the easy way, not just because it's easier but 
+also because we'll be using an unsorted list (which makes it harder to 
+determine how long until a timer IRQ is needed next).
+</p><p>For "nano_sleep_until()" you'd store the time the task is 
+supposed to wake up somewhere, put the task on the unsorted list, then 
+block the task. You'll need to add a "wake up time" field to the data 
+structure you're using to keep track of tasks for this, and you'll need 
+to define a new task state ("SLEEPING"). The code might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1">thread_control_block <span class="sy0">*</span> sleeping_task_list <span class="sy0">=</span> NULL<span class="sy0">;</span>
+&nbsp;
+<span class="kw4">void</span> nano_sleep_until<span class="br0">(</span><span class="kw4">uint64_t</span> when<span class="br0">)</span> <span class="br0">{</span>
+    lock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Make sure "when" hasn't already occured</span>
+&nbsp;
+    <span class="kw1">if</span><span class="br0">(</span>when <span class="sy0">&lt;</span> get_time_since_boot<span class="br0">(</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+        unlock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+        <span class="kw1">return</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+&nbsp;
+    <span class="co1">// Set time when task should wake up</span>
+&nbsp;
+    current_task_TCB<span class="sy0">-&gt;</span>sleep_expiry <span class="sy0">=</span> when<span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Add task to the start of the unsorted list of sleeping tasks</span>
+&nbsp;
+    current_task_TCB<span class="sy0">-&gt;</span>next <span class="sy0">=</span> sleeping_task_list<span class="sy0">;</span>
+    sleeping_task_list <span class="sy0">=</span> current_task_TCB<span class="sy0">;</span>
+&nbsp;
+    unlock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Find something else for the CPU to do</span>
+&nbsp;
+    block_task<span class="br0">(</span>SLEEPING<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>Note that we're using the same "next" field in the data structure 
+that the kernel uses to keep track of a task's information that the 
+scheduler uses for its list of "ready to run" tasks. A task can't be 
+ready to run and sleeping at the same time, so this is fine.
+</p><p>The code for the timer IRQ handler depends a little on which 
+timer you're using. If you're using the PIT chip on 80x86 PCs, and the 
+PIT chip has been set to a frequency of about 1000 Hz, then the timer 
+IRQ handler might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">uint64_t</span> time_since_boot <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="kw4">uint64_t</span> time_between_ticks <span class="sy0">=</span> <span class="nu0">1000000</span><span class="sy0">;</span>  <span class="co1">// 1000 Hz = 1 ms between ticks = 1000000 nanoseconds between ticks</span>
+&nbsp;
+<span class="kw4">void</span> PIT_IRQ_handler<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    thread_control_block <span class="sy0">*</span> next_task<span class="sy0">;</span>
+    thread_control_block <span class="sy0">*</span> this_task<span class="sy0">;</span>
+&nbsp;
+    lock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    time_since_boot <span class="sy0">+=</span> time_between_ticks<span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Move everything from the sleeping task list into a temporary variable and make the sleeping task list empty</span>
+&nbsp;
+    next_task <span class="sy0">=</span> sleeping_task_list<span class="sy0">;</span>
+    sleeping_task_list <span class="sy0">=</span> NULL<span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// For each task, wake it up or put it back on the sleeping task list</span>
+&nbsp;
+    <span class="kw1">while</span><span class="br0">(</span>next_task <span class="sy0">!=</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        this_task <span class="sy0">=</span> next_task<span class="sy0">;</span>
+        next_task <span class="sy0">=</span> this_task<span class="sy0">-&gt;</span>next<span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span><span class="br0">(</span>this_task<span class="sy0">-&gt;</span>sleep_expiry <span class="sy0">&lt;=</span> time_since_boot<span class="br0">)</span> <span class="br0">{</span>
+            <span class="co1">// Task needs to be woken up</span>
+            unblock_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+        <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+            <span class="co1">// Task needs to be put back on the sleeping task list</span>
+            task<span class="sy0">-&gt;</span>next <span class="sy0">=</span> sleeping_task_list<span class="sy0">;</span>
+            sleeping_task_list <span class="sy0">=</span> task<span class="sy0">;</span>
+        <span class="br0">}</span>
+    <span class="br0">}</span>
+&nbsp;
+    <span class="co1">// Done, unlock the scheduler (and do any postponed task switches!)</span>
+&nbsp;
+    unlock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>Finally, test the code to make sure tasks block and unblock correctly
+ when they call "sleep()" or "nano_sleep()" or "nano_sleep_until()". 
+Please note that currently there's a minor problem with the scheduler - 
+if all tasks are blocked waiting for something (either paused or 
+sleeping) there won't be any tasks that the scheduler can give CPU time 
+to so the scheduler will give CPU time to a task that is supposed to be 
+blocked (which is bad!). For now, just make sure that at least one task 
+is running.
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Step_10:_Idle_Time">Step 10: Idle Time</span></h2>
+<p>For a real OS, often there's nothing for a CPU to do because all 
+tasks are blocked waiting for something (e.g. waiting or the user to 
+press a key). There are two very different ways to handle this situation
+ - either you have a special "idle task" that never blocks so that (as 
+far as the scheduler is concerned) there is always a task that can be 
+given CPU time; or you add code to the scheduler to wait until a task is
+ unblocked.
+</p><p>The first way is easier initially. The problem is that modern 
+CPUs have power management involving multiple power saving states, where
+ deeper power saving states save more power but take longer to return to
+ full speed. The normal solution is to progressively move to deeper 
+sleeps states so that if the CPU is only idle for a short time it's only
+ in a light sleep state and can return to full speed quickly, and if the
+ CPU was idle for a long time it'll be in a deep sleep state and save 
+lots of power. What this means is that for modern power management you 
+need to keep track of how long a CPU has been idle, and that's hard to 
+do when you have a simple idle task that doesn't know when the CPU 
+starts being idle or stops being idle.
+</p><p>For this, I'm going to try to cover both options.
+</p>
+<h3> <span class="mw-headline" id="Idle_Time_With_Idle_Task">Idle Time With Idle Task</span></h3>
+<p>To implement an idle task the first thing you'll need is an idle 
+task(!). We can already create new kernel tasks, we just need code for 
+the task itself. This code can be a loop that does nothing; but most CPU
+ have an instruction you can use to wait for something (e.g. the "HLT" 
+instruction on 80x87 that waits until an IRQ occurs) that saves a little
+ power, and in that case it's probably a good idea to use that 
+instruction in the idle task's loop.
+</p><p>The code might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> kernel_idle_task<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">for</span><span class="br0">(</span><span class="sy0">;;</span><span class="br0">)</span> <span class="br0">{</span>
+        HLT<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+<span class="br0">}</span></pre></div></div>
+<p>The next problem is that currently we're still using an awful 
+cooperative round robin scheduler, which means that if the scheduler 
+gives the idle task any CPU time it might hog all of the CPU time even 
+after other tasks wake up. What we really need is a scheduler that isn't
+ awful - e.g. a scheduler that understands task priorities, so that we 
+can give the idle task the lowest possible priority and let all the 
+other tasks (which will have higher priorities) preempt the idle task.
+</p><p>However; we don't really want to implement a complicated 
+scheduler yet. Instead, we can use a few temporary hacks to simulate an 
+extremely low priority without actually implementing full support for 
+task priorities.
+</p><p>For this, you'll need a variable to keep track of which task is 
+the idle task. Then you'd modify the "unblock_task()" code so that the 
+idle task is always pre-empted, like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> unblock_task<span class="br0">(</span>thread_control_block <span class="sy0">*</span> task<span class="br0">)</span> <span class="br0">{</span>
+    lock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw1">if</span><span class="br0">(</span> <span class="br0">(</span>first_ready_to_run_task <span class="sy0">==</span> NULL<span class="br0">)</span> <span class="sy0">||</span> <span class="br0">(</span>current_task_TCB <span class="sy0">==</span> idle_task<span class="br0">)</span> <span class="br0">)</span> <span class="br0">{</span>
+&nbsp;
+        <span class="co1">// Only one task was running before, or the idle task is currently running, so pre-empt</span>
+&nbsp;
+        switch_to_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+        <span class="co1">// There's at least one task on the "ready to run" queue already, so don't pre-empt</span>
+&nbsp;
+        last_ready_to_run_task<span class="sy0">-&gt;</span>next <span class="sy0">=</span> task<span class="sy0">;</span>
+        last_ready_to_run_task <span class="sy0">=</span> task<span class="sy0">;</span>
+    <span class="br0">}</span>
+    unlock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>The other thing you'd want to do is modify "schedule()" so that it 
+tries to avoid giving the idle task CPU time when other task's are 
+"ready to run":
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> schedule<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">if</span><span class="br0">(</span>postpone_task_switches_counter <span class="sy0">!=</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+        task_switches_postponed_flag <span class="sy0">=</span> <span class="nu0">1</span><span class="sy0">;</span>
+        <span class="kw1">return</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+    <span class="kw1">if</span><span class="br0">(</span> first_ready_to_run_task <span class="sy0">!=</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        thread_control_block <span class="sy0">*</span> task <span class="sy0">=</span> first_ready_to_run_task<span class="sy0">;</span>
+        first_ready_to_run_task <span class="sy0">=</span> task<span class="sy0">-&gt;</span>next<span class="sy0">;</span>
+        <span class="kw1">if</span><span class="br0">(</span>task <span class="sy0">==</span> idle_task<span class="br0">)</span> <span class="br0">{</span>
+            <span class="co1">// Try to find an alternative to prevent the idle task getting CPU time</span>
+            <span class="kw1">if</span><span class="br0">(</span> first_ready_to_run_task <span class="sy0">!=</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+                <span class="co1">// Idle task was selected but other task's are "ready to run"</span>
+                task <span class="sy0">=</span> first_ready_to_run_task<span class="sy0">;</span>
+                idle_task<span class="sy0">-&gt;</span>next <span class="sy0">=</span> task<span class="sy0">-&gt;</span>next<span class="sy0">;</span>
+                first_ready_to_run_task <span class="sy0">=</span> idle_task<span class="sy0">;</span>
+            <span class="br0">}</span> <span class="kw1">else</span> <span class="kw1">if</span><span class="br0">(</span> current_task_TCB<span class="sy0">-&gt;</span>state <span class="sy0">==</span> RUNNING<span class="br0">)</span> <span class="br0">{</span>
+                <span class="co1">// No other tasks ready to run, but the currently running task wasn't blocked and can keep running</span>
+                <span class="kw1">return</span><span class="sy0">;</span>
+            <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+                <span class="co1">// No other options - the idle task is the only task that can be given CPU time</span>
+            <span class="br0">}</span>
+        <span class="br0">}</span>
+        switch_to_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+<span class="br0">}</span></pre></div></div>
+<p>Note that this is a relatively crude hack; but that's fine for now - 
+later we're going to replace the scheduler with something less awful 
+anyway.
+</p><p><br>
+</p>
+<h3> <span class="mw-headline" id="Idle_Time_Without_Idle_Task">Idle Time Without Idle Task</span></h3>
+<p>In this case we need to add support for "no task running" in every 
+piece of code that currently assumes "current_task_TCB" points to a 
+valid task's information, so that we can set "current_task_TCB" to NULL 
+when the CPU is idle.
+</p><p>The code for blocking a task should be fine (even though it does 
+use "current_task_TCB") because the scheduler will never call this 
+function when there's no task running; and the code for unblocking a 
+task is fine.
+</p><p>The (optional) code for time accounting does need to be fixed 
+though, and it'd be nice to keep track of how much time the CPU spend 
+idle too, so that can be changed to something like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">uint64_t</span> CPU_idle_time <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw4">void</span> update_time_used<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    current_count <span class="sy0">=</span> read_counter<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    elapsed <span class="sy0">=</span> last_count <span class="sy0">-</span> current_count<span class="sy0">;</span>
+    last_count <span class="sy0">=</span> current_count<span class="sy0">;</span>
+    <span class="kw1">if</span><span class="br0">(</span>current_task_TCB <span class="sy0">==</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        <span class="co1">// CPU is idle</span>
+        CPU_idle_time <span class="sy0">+=</span> elapsed<span class="sy0">;</span>
+    <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+        current_task_TCB<span class="sy0">-&gt;</span>time_used <span class="sy0">+=</span> elapsed<span class="sy0">;</span>
+    <span class="br0">}</span>
+<span class="br0">}</span></pre></div></div>
+<p>That only leaves the "schedule()" function itself, which could end up like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> schedule<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    thread_control_block <span class="sy0">*</span> task<span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">if</span><span class="br0">(</span>postpone_task_switches_counter <span class="sy0">!=</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+        task_switches_postponed_flag <span class="sy0">=</span> <span class="nu0">1</span><span class="sy0">;</span>
+        <span class="kw1">return</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+&nbsp;
+    <span class="kw1">if</span><span class="br0">(</span> first_ready_to_run_task <span class="sy0">!=</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        task <span class="sy0">=</span> first_ready_to_run_task<span class="sy0">;</span>
+        first_ready_to_run_task <span class="sy0">=</span> task<span class="sy0">-&gt;</span>next<span class="sy0">;</span>
+        switch_to_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span> <span class="kw1">else</span> <span class="kw1">if</span><span class="br0">(</span> current_task_TCB<span class="sy0">-&gt;</span>state <span class="sy0">==</span> RUNNING<span class="br0">)</span> <span class="br0">{</span>
+        <span class="co1">// Do nothing, currently running task can keep running</span>
+    <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+&nbsp;
+        <span class="co1">// Currently running task blocked and there's no other tasks</span>
+&nbsp;
+        task <span class="sy0">=</span> current_task_TCB<span class="sy0">;</span>                           <span class="co1">// "task" is the task that we're borrowing while idle</span>
+        current_task_TCB <span class="sy0">=</span> NULL<span class="sy0">;</span>                           <span class="co1">// Make sure other code knows we're not actually running the task we borrowed</span>
+        <span class="kw4">uint64_t</span> idle_start_time <span class="sy0">=</span> get_time_since_boot<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>  <span class="co1">// For future power management support</span>
+&nbsp;
+        <span class="co1">// Do nothing while waiting for a task to unblock and become "ready to run".  The only thing that is going to update </span>
+        <span class="co1">// first_ready_to_run_task is going to be from a timer IRQ (with a single processor anyway), but interrupts are disabled.</span>
+        <span class="co1">// The timer must be allowed to fire, but do not allow any task changes to take place.  The task_switches_postponed_flag</span>
+        <span class="co1">// must remain set to force the timer to return to this loop.</span>
+&nbsp;
+&nbsp;
+        <span class="kw1">do</span> <span class="br0">{</span>
+            STI<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>          <span class="co1">// enable interrupts to allow the timer to fire</span>
+            HLT<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>          <span class="co1">// halt and wait for the timer to fire</span>
+            CLI<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>          <span class="co1">// disable interrupts again to see if there is something to do</span>
+        <span class="br0">}</span> <span class="kw1">while</span><span class="br0">(</span> <span class="br0">(</span>first_ready_to_run_task <span class="sy0">==</span> NULL<span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">// Stop borrowing the task</span>
+&nbsp;
+        current_task_TCB <span class="sy0">=</span> task<span class="sy0">;</span>                          
+&nbsp;
+        <span class="co1">// Switch to the task that unblocked (unless the task that unblocked happens to be the task we borrowed)</span>
+&nbsp;
+        task <span class="sy0">=</span> first_ready_to_run_task<span class="sy0">;</span>
+        first_ready_to_run_task <span class="sy0">=</span> task<span class="sy0">-&gt;</span>next<span class="sy0">;</span>
+        <span class="kw1">if</span><span class="br0">(</span>task <span class="sy0">!=</span> current_task_TCB<span class="br0">)</span> <span class="br0">{</span>
+            switch_to_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+        <span class="br0">}</span>
+    <span class="br0">}</span>
+<span class="br0">}</span></pre></div></div>
+<h2> <span class="mw-headline" id="Step_11:_Time_Slices">Step 11: Time Slices</span></h2>
+<p>Most schedulers have some kind of limit on the amount of time that a 
+task can consume CPU time; which can mean terminating a task (if the 
+kernel assumes that the task locked up) or switching to a different task
+ as part of a time sharing scheme.
+</p><p>Because we've been using an awful cooperative round robin 
+scheduler anyway; the next logical step is to add time slices to convert
+ it into an awful preemptive round robin scheduler.
+</p><p>For this you will need some kind of timer again, where the 
+timer's IRQ handler just calls "schedule()" when a task has used all of 
+the CPU time that the scheduler gave it. However, if you're using a 
+timer set to a fixed frequency typically a relatively high frequency is 
+used (e.g. 1000 Hz) to get better precision from it, and you don't want 
+to do a task switch so often. In that case the easy solution is for the 
+timer's IRQ handler to decrease a "time slice length remaining" variable
+ and only do the task switch if the time has run out.
+</p><p>The other thing that might be worth mentioning is that (for most 
+scheduling algorithms) when there's only one task that can be running 
+there's point having the overhead of "schedule()" because it's only 
+going to decide to let the currently running task keep running; and if 
+you implemented idle time without a special idle task there might be no 
+tasks running. For both of these situations there's no point having a 
+time slice length. For that we can just use a special value (e.g. zero) 
+to signify that there's no time slice length.
+</p><p>For the earlier example (using the PIT on 80x86 at a frequency of 1000 Hz) it might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">uint64_t</span> time_slice_remaining <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw4">uint64_t</span> time_since_boot <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="kw4">uint64_t</span> time_between_ticks <span class="sy0">=</span> <span class="nu0">1000000</span><span class="sy0">;</span>  <span class="co1">// 1000 Hz = 1 ms between ticks = 1000000 nanoseconds between ticks</span>
+&nbsp;
+<span class="kw4">void</span> PIT_IRQ_handler<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    thread_control_block <span class="sy0">*</span> next_task<span class="sy0">;</span>
+    thread_control_block <span class="sy0">*</span> this_task<span class="sy0">;</span>
+&nbsp;
+    lock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    time_since_boot <span class="sy0">+=</span> time_between_ticks<span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Move everything from the sleeping task list into a temporary variable and make the sleeping task list empty</span>
+&nbsp;
+    next_task <span class="sy0">=</span> sleeping_task_list<span class="sy0">;</span>
+    sleeping_task_list <span class="sy0">=</span> NULL<span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// For each task, wake it up or put it back on the sleeping task list</span>
+&nbsp;
+    <span class="kw1">while</span><span class="br0">(</span>next_task <span class="sy0">!=</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        this_task <span class="sy0">=</span> next_task<span class="sy0">;</span>
+        next_task <span class="sy0">=</span> this_task<span class="sy0">-&gt;</span>next<span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span><span class="br0">(</span>this_task<span class="sy0">-&gt;</span>sleep_expiry <span class="sy0">&lt;=</span> time_since_boot<span class="br0">)</span> <span class="br0">{</span>
+            <span class="co1">// Task needs to be woken up</span>
+            unblock_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+        <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+            <span class="co1">// Task needs to be put back on the sleeping task list</span>
+            task<span class="sy0">-&gt;</span>next <span class="sy0">=</span> sleeping_task_list<span class="sy0">;</span>
+            sleeping_task_list <span class="sy0">=</span> task<span class="sy0">;</span>
+        <span class="br0">}</span>
+    <span class="br0">}</span>
+&nbsp;
+    <span class="co1">// Handle "end of time slice" preemption</span>
+&nbsp;
+    <span class="kw1">if</span><span class="br0">(</span>time_slice_remaining <span class="sy0">!=</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+        <span class="co1">// There is a time slice length</span>
+        <span class="kw1">if</span><span class="br0">(</span>time_slice_remaining <span class="sy0">&lt;=</span> time_between_ticks<span class="br0">)</span> <span class="br0">{</span>
+            schedule<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+        <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+            time_slice_remaining <span class="sy0">-=</span> time_between_ticks<span class="sy0">;</span>
+        <span class="br0">}</span>
+    <span class="br0">}</span>
+&nbsp;
+    <span class="co1">// Done, unlock the scheduler (and do any postponed task switches!)</span>
+&nbsp;
+    unlock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>The other change that's needed is that the "time_slice_remaining" 
+variable needs to be set when a task switch happens. This can be done in
+ the low level task switch code (which is "architecture specific 
+assembly").
+</p><p>If you added a wrapper earlier (when updating locking in Step 8),
+ and if you implemented idle time using an idle task, then it might look
+ like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="co2">#define TIME_SLICE_LENGTH  50000000   // 50000000 nanoseconds is 50 ms</span>
+&nbsp;
+switch_to_task_wrapper<span class="br0">(</span>thread_control_block <span class="sy0">*</span>task<span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">if</span><span class="br0">(</span>postpone_task_switches_counter <span class="sy0">!=</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+        task_switches_postponed_flag <span class="sy0">=</span> <span class="nu0">1</span><span class="sy0">;</span>
+        <span class="kw1">return</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+&nbsp;
+    <span class="kw1">if</span><span class="br0">(</span>task <span class="sy0">==</span> idle_task<span class="br0">)</span> <span class="br0">{</span>
+        time_slice_remaining <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+        time_slice_remaining <span class="sy0">=</span> TIME_SLICE_LENGTH<span class="sy0">;</span>
+    <span class="br0">}</span>
+    switch_to_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>If you added a wrapper earlier and implemented idle time without an idle task, then it might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="co2">#define TIME_SLICE_LENGTH  50000000   // 50000000 nanoseconds is 50 ms</span>
+&nbsp;
+switch_to_task_wrapper<span class="br0">(</span>thread_control_block <span class="sy0">*</span>task<span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">if</span><span class="br0">(</span>postpone_task_switches_counter <span class="sy0">!=</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+        task_switches_postponed_flag <span class="sy0">=</span> <span class="nu0">1</span><span class="sy0">;</span>
+        <span class="kw1">return</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+&nbsp;
+    <span class="kw1">if</span><span class="br0">(</span><span class="br0">(</span>current_task_TCB <span class="sy0">==</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        <span class="co1">// Task unblocked and stopped us being idle, so only one task can be running</span>
+        time_slice_remaining <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="br0">}</span> <span class="kw1">else</span> <span class="kw1">if</span><span class="br0">(</span> <span class="br0">(</span>first_ready_to_run_task <span class="sy0">==</span> NULL<span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="br0">(</span>current_task_TCB<span class="sy0">-&gt;</span>state <span class="sy0">!=</span> RUNNING<span class="br0">)</span> <span class="br0">)</span> <span class="br0">{</span>
+        <span class="co1">// Currently running task blocked and the task we're switching to is the only task left</span>
+        time_slice_remaining <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+        <span class="co1">// More than one task wants the CPU, so set a time slice length</span>
+        time_slice_remaining <span class="sy0">=</span> TIME_SLICE_LENGTH<span class="sy0">;</span>
+    <span class="br0">}</span>
+    switch_to_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>If you're not using a wrapper, it shouldn't be too hard to convert 
+the changes above into assembly and add them to your low-level task 
+switch code (for both cases; it's just some comparisons, branches and 
+moves).
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Step_12:_Task_Termination">Step 12: Task Termination</span></h2>
+<p>Tasks are terminated for a variety of reasons (e.g. they crashed, 
+called "exit()", received a kill signal, etc); and sooner or later 
+you'll want to provide a low-level function that the kernel can use to 
+terminate a task for any of these reasons.
+</p><p>Terminating a task is a little tricky - you want to do things 
+like free any memory that the task was using for its kernel stack; but 
+you can't do that while the  CPU is currently using the task's kernel 
+stack. To work around that, you cheat - you don't terminate the task 
+immediately and just set the task's state to "TERMINATED" and make the 
+task block. A little later (when you're running some other task) there's
+ no problem with freeing things like the terminated task's kernel stack 
+because you know the CPU isn't using it.
+</p><p>So, how do you tell another task that it needs to clean up after a
+ recently terminated task? Usually I write micro-kernels with message 
+passing, and when a task is terminated I send a message to a "cleaner" 
+to tell it the task was terminated, and then the "cleaner" can do the 
+clean up work. We don't have any message passing (and don't have pipes 
+or IPC of any kind yet) but what we do have is the ability to pause and 
+unpause tasks (from Step 6), and as long as we're a little bit careful 
+that's good enough.
+</p><p>The task termination might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1">thread_control_block <span class="sy0">*</span>terminated_task_list <span class="sy0">=</span> NULL<span class="sy0">;</span>
+&nbsp;
+<span class="kw4">void</span> terminate_task<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+&nbsp;
+    <span class="co1">// Note: Can do any harmless stuff here (close files, free memory in user-space, ...) but there's none of that yet</span>
+&nbsp;
+    lock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Put this task on the terminated task list</span>
+&nbsp;
+    lock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    current_task_TCB<span class="sy0">-&gt;</span>next <span class="sy0">=</span> terminated_task_list<span class="sy0">;</span>
+    terminated_task_list <span class="sy0">=</span> current_task_TCB<span class="sy0">;</span>
+    unlock_scheduler<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Block this task (note: task switch will be postponed until scheduler lock is released)</span>
+&nbsp;
+    block_task<span class="br0">(</span>TERMINATED<span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Make sure the cleaner task isn't paused</span>
+&nbsp;
+    unblock_task<span class="br0">(</span>cleaner_task<span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Unlock the scheduler's lock</span>
+&nbsp;
+    unlock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>Note that we're using the same "next" field in the data structure 
+that the kernel uses to keep track of a task's information that the 
+scheduler uses for its list of "ready to run" tasks (which is used for 
+sleeping tasks too!). A task can't be ready to run and terminated at the
+ same time, and a task can't be sleeping and terminated at the same 
+time, so this is fine.
+</p><p>Of course this won't work without a "cleaner" task. The cleaner task might look a little bit like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> cleaner_task<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    thread_control_block <span class="sy0">*</span>task<span class="sy0">;</span>
+&nbsp;
+    lock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">while</span><span class="br0">(</span>terminated_task_list <span class="sy0">!=</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        task <span class="sy0">=</span> terminated_task_list<span class="sy0">;</span>
+        terminated_task_list <span class="sy0">=</span> task<span class="sy0">-&gt;</span>next<span class="sy0">;</span>
+        cleanup_terminated_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+&nbsp;
+    block_task<span class="br0">(</span>PAUSED<span class="br0">)</span><span class="sy0">;</span>
+    unlock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+&nbsp;
+<span class="kw4">void</span> cleanup_terminated_task<span class="br0">(</span>thread_control_block <span class="sy0">*</span> task<span class="br0">)</span> <span class="br0">{</span>
+        kfree<span class="br0">(</span>task<span class="sy0">-&gt;</span>kernel_stack_top <span class="sy0">-</span> KERNEL_STACK_SIZE<span class="br0">)</span><span class="sy0">;</span>
+        kfree<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<h2> <span class="mw-headline" id="Step_13:_Mutexes_and_Semaphores">Step 13: Mutexes and Semaphores</span></h2>
+<p>There are a lot of similarities between mutexes and semaphores - the 
+both cause tasks to block when they can't acquire them and unblock a 
+task when they can be acquired later, and they both are used for similar
+ purpose (to restrict the number of tasks accessing a piece of data at 
+the same time). The only real difference is the number of tasks that are
+ allowed to access a piece of data at the same time - for mutexes this 
+number is always one, and for semaphores the number is may be higher 
+than 1.
+</p><p>In fact; if you really wanted to you could implement semaphores 
+and then not bother implementing mutexes (and just use a semaphore with a
+ count of 1 instead). However, this isn't really a great idea because 
+you can optimise a mutex more(because you know it will only allow one 
+task) and semaphores are rarely used (e.g. I have never needed one, 
+ever). Even though it's not a great idea, this is exactly what we're 
+going to do - there's so many similarities that it will avoid code 
+duplication, and we don't really care about performance much anyway!
+</p><p>For multi-CPU systems, a semaphore (or mutex) begins with data 
+structure to keep track of its state, and a spinlock to protect that 
+state. We're not writing code for multi-CPU systems so we're not going 
+to have a spinlock; and we already have (at least conceptually) a "big 
+scheduler lock" we can use to protect the semaphore's data; so we're 
+going to cheat to keep things simple.
+</p><p>The first thing we'll want is the semaphore's structure itself, 
+which mostly just needs a few fields for counts plus a linked list for 
+waiting tasks. For the linked list of waiting tasks I want to make sure 
+tasks are taken from the front and added to the back to ensure that one 
+task can be very unlucky and end up waiting forever while other tasks 
+are lucky and keep acquiring the semaphore, which is slightly more 
+tricky with singly linked lists (you need a "last task" field and a 
+"first task" field). The semaphore's structure can be something like 
+this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">typedef</span> <span class="kw4">struct</span> <span class="br0">{</span>
+    <span class="kw4">int</span> max_count<span class="sy0">;</span>
+    <span class="kw4">int</span> current_count<span class="sy0">;</span>
+    thread_control_block <span class="sy0">*</span>first_waiting_task<span class="sy0">;</span>
+    thread_control_block <span class="sy0">*</span>last_waiting_task<span class="sy0">;</span>
+<span class="br0">}</span> SEMAPHORE<span class="sy0">;</span></pre></div></div>
+<p><br>
+Next we'll want some functions to create a semaphore or a mutex, like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1">SEMAPHORE <span class="sy0">*</span>create_semaphore<span class="br0">(</span><span class="kw4">int</span> max_count<span class="br0">)</span> <span class="br0">{</span>
+    SEMAPHORE <span class="sy0">*</span> semaphore<span class="sy0">;</span>
+&nbsp;
+    semaphore <span class="sy0">=</span> kmalloc<span class="br0">(</span><span class="kw4">sizeof</span><span class="br0">(</span>SEMAPHORE<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw1">if</span><span class="br0">(</span>semaphore <span class="sy0">!=</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        semaphore<span class="sy0">-&gt;</span>max_count <span class="sy0">=</span> max_count<span class="sy0">;</span>
+        semaphore<span class="sy0">-&gt;</span>current_count <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+        semaphore<span class="sy0">-&gt;</span>first_waiting_task <span class="sy0">=</span> NULL<span class="sy0">;</span>
+        semaphore<span class="sy0">-&gt;</span>last_waiting_task <span class="sy0">=</span> NULL<span class="sy0">;</span>
+    <span class="br0">}</span>
+<span class="br0">}</span>
+&nbsp;
+SEMAPHORE <span class="sy0">*</span>create_mutex<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">return</span> create_semaphore<span class="br0">(</span><span class="nu0">1</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>With that done, we want some functions to acquire a semaphore or a mutex:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> acquire_semaphore<span class="br0">(</span>SEMAPHORE <span class="sy0">*</span> semaphore<span class="br0">)</span> <span class="br0">{</span>
+    lock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw1">if</span><span class="br0">(</span>semaphore<span class="sy0">-&gt;</span>current_count <span class="sy0">&lt;</span> semaphore<span class="sy0">-&gt;</span>max_count<span class="br0">)</span> <span class="br0">{</span>
+        <span class="co1">// We can acquire now</span>
+        semaphore<span class="sy0">-&gt;</span>current_count<span class="sy0">++;</span>
+    <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+        <span class="co1">// We have to wait</span>
+        current_task_TCB<span class="sy0">-&gt;</span>next <span class="sy0">=</span> NULL<span class="sy0">;</span>
+        <span class="kw1">if</span><span class="br0">(</span>semaphore<span class="sy0">-&gt;</span>first_waiting_task <span class="sy0">==</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+            semaphore<span class="sy0">-&gt;</span>first_waiting_task <span class="sy0">=</span> current_task_TCB<span class="sy0">;</span>
+        <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+            semaphore<span class="sy0">-&gt;</span>last_waiting_task<span class="sy0">-&gt;</span>next <span class="sy0">=</span> current_task_TCB<span class="sy0">;</span>
+        <span class="br0">}</span>
+        semaphore<span class="sy0">-&gt;</span>last_waiting_task <span class="sy0">=</span> current_task_TCB<span class="sy0">;</span>
+        block_task<span class="br0">(</span>WAITING_FOR_LOCK<span class="br0">)</span><span class="sy0">;</span>    <span class="co1">// This task will be unblocked when it can acquire the semaphore</span>
+    <span class="br0">}</span>
+    unlock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+&nbsp;
+<span class="kw4">void</span> acquire_mutex<span class="br0">(</span>SEMAPHORE <span class="sy0">*</span> semaphore<span class="br0">)</span> <span class="br0">{</span>
+    acquire_semaphore<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>Lastly, we need to be able to release the semaphore or mutex:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"><span class="kw4">void</span> release_semaphore<span class="br0">(</span>SEMAPHORE <span class="sy0">*</span> semaphore<span class="br0">)</span> <span class="br0">{</span>
+    lock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">if</span><span class="br0">(</span>semaphore<span class="sy0">-&gt;</span>first_waiting_task <span class="sy0">!=</span> NULL<span class="br0">)</span> <span class="br0">{</span>
+        <span class="co1">// We need to wake up the first task that was waiting for the semaphore</span>
+        <span class="co1">// Note: "semaphore-&gt;current_count" remains the same (this task leaves and another task enters)</span>
+&nbsp;
+        thread_control_block <span class="sy0">*</span>task <span class="sy0">=</span> semaphore<span class="sy0">-&gt;</span>first_waiting_task<span class="sy0">;</span>
+        semaphore<span class="sy0">-&gt;</span>first_waiting_task <span class="sy0">=</span> task<span class="sy0">-&gt;</span>next<span class="sy0">;</span>
+        unblock_task<span class="br0">(</span>task<span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+        <span class="co1">// No tasks are waiting</span>
+        semaphore<span class="sy0">-&gt;</span>current_count<span class="sy0">--;</span>
+    <span class="br0">}</span>
+    unlock_stuff<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+&nbsp;
+<span class="kw4">void</span> release_mutex<span class="br0">(</span>SEMAPHORE <span class="sy0">*</span> semaphore<span class="br0">)</span> <span class="br0">{</span>
+    release_semaphore<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p><br>
+Note that we're using the same "next" field in the data structure that 
+the kernel uses to keep track of a task's information that the scheduler
+ uses for its list of "ready to run" tasks (which is used for sleeping 
+tasks and terminated tasks too!). A task can't be in multiple states at 
+the same time, so this is fine.
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Step_14:_Inter-process_Communication_.28IPC.29">Step 14: Inter-process Communication (IPC)</span></h2>
+<p>There's a lot of different types of IPC (remote procedure calls, 
+signals, pipes, synchronous messages, asynchronous messages, ...) but 
+most of them have a few similarities:
+</p>
+<ul><li> they aren't just used for communication between different 
+processes (e.g. can be used for communication between different threads 
+in the same process, and for for a monolithic kernel, this can include 
+communication between drivers in kernel space and tasks in user-space).
+</li><li> they cause tasks to block (e.g. when waiting for data to 
+arrive, and sometimes when waiting to send data) and unblock (when data 
+arrives or data can be sent)
+</li><li> often (especially for micro-kernels) it's responsible for the majority of task switches
+</li></ul>
+<p>I'm not going to provide examples of any of the different kinds of 
+IPC - I want you to implement whatever you feel like having by yourself 
+to get more experience. Note that there's multiple examples of "tasks 
+blocked waiting on a list" in the previous steps of this tutorial.
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Step_15:_.22Schedule.28.29.22_Version_3">Step 15: "Schedule()" Version 3</span></h2>
+<p>If you've got this far, you should have a fairly respectable 
+scheduler with most of the features a scheduler in a modern OS needs. 
+The main problem at the moment is that it's still an awful round robin 
+scheduler. It's time to replace it with something better.
+</p><p>So, what is "better"?
+</p><p>It's impossible to answer that question without knowing what the 
+OS will be used for and what kinds of tasks it will be running - an OS 
+designed specifically for (e.g.) "hard real time" embedded systems 
+(where the scheduler must provide strict guarantees) is very different 
+to a (e.g.) an OS designed for scientific computer (where you expect a 
+single task will hog all CPU time and the scheduler itself isn't very 
+important).
+</p><p>However, for a general purpose OS that has to handle a wide range
+ of different tasks with different requirements it becomes much easier 
+to define "better" - for this case, "better" is something that is able 
+to handle a wide range of different tasks with different requirements!
+</p><p>For this, you'd need to figure out what the different 
+requirements are. Maybe you want to support "hard real-time" tasks 
+(which is not recommended for beginners in general); and maybe you want 
+to support "soft real-time" tasks (things like video decoders and sound 
+systems that have to process data at a fixed rate to avoid dropping 
+frames or causing audible glitches), and maybe you want to support 
+"background tasks" that never get any CPU time unless there's nothing 
+else the CPU can be used for.
+</p><p>Once you've decided what the different requirements are, you can 
+define "scheduling policies" for each one. For an example; Linux uses 
+four scheduling policies (SCHED_FIFO, SCHED_RR, SCHED_DEADLINE and 
+SCHED_OTHER).
+</p><p>Then you'd need to figure out how the different policies relate 
+to each other. The simplest way to do this is to assign them an order; 
+where tasks using a lower policy only ever get CPU time when there are 
+no tasks in a higher policy that want CPU time (and where "policy 0" 
+might be sort of real-time policy and "policy 3" might be for 
+background/idle tasks). In any case, you'll probably end up with a kind 
+of "meta-scheduler" that decides which policy should be used. Once 
+that's done, you need to choose a scheduling algorithm for each 
+scheduling policy, and decide if each scheduling policy has (or doesn't 
+have) task priorities within the policy, and decide on the rules that 
+determine when one task (that's been created or unblocked) will preempt 
+the currently running task.
+</p><p>For an full example (from a previous micro-kernel of mine), I used:
+</p>
+<ul><li> Policy 0: Intended for low latency tasks (e.g. device driver 
+IRQ handlers). Uses a "highest priority task that can run does run" 
+scheduling algorithm, and tasks within this policy have a priority (0 to
+ 255). These tasks will preempt all tasks in lower policies and all 
+tasks with lower priority in the same policy.
+</li></ul>
+<ul><li> Policy 1: Intended for tasks with some latency requirements 
+(e.g. user interfaces, GUIs, etc). Uses a "highest priority task that 
+can run does run" scheduling algorithm, and tasks within this policy 
+have a priority (0 to 255). These tasks will preempt all tasks in lower 
+policies and all tasks with lower priority in the same policy.
+</li></ul>
+<ul><li> Policy 2: Intended for normal tasks. Uses a "variable 
+frequency, fixed time slice" scheduling algorithm. Tasks within this 
+policy have a priority (0 to 255) that determines how many (fixed 
+length) time slices the task gets. Tasks will preempt all tasks in lower
+ policies but will not preempt tasks in the same policy.
+</li></ul>
+<ul><li> Policy 3: Intended for background tasks. Uses a "variable time 
+slice" scheduling algorithm, and tasks have a priority (0 to 255) that 
+determines the length of the time slice they get. These tasks never 
+preempt anything.
+</li></ul>
+<p><br>
+Once you've decided how your scheduler will work; you should only need 
+to modify your "schedule()" and "unblock_task()" functions to make it 
+happen.
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Adding_User-Space_Support">Adding User-Space Support</span></h2>
+<p>Sooner or later you're probably going to want user-space tasks (e.g. 
+processes and threads). This doesn't have much to do with the scheduler 
+itself - it just means that while a kernel task is running it can switch
+ between kernel and user-space where appropriate. It's important/useful 
+to understand that when the CPU is running user-space code, something 
+(system call, IRQ, exception, ...) will happen to cause the CPU to 
+switch to kernel code, and then after kernel code is already running the
+ kernel's code may decide to do a task switch. Because kernel code is 
+always running before a task switch happens, kernel code will also be 
+running after a task switch happens. In other words, task switches only 
+ever happen between tasks running kernel code and other tasks running 
+kernel code (and never involve a task running user-space code). This 
+also means that the "switch_to_task()" code described in this tutorial 
+(which is very fast because it doesn't save or load much) doesn't need 
+to be changed when you add user-space support (until you start 
+supporting things like FPU, MMX, SSE, AVX).
+</p><p>Typically; the main difficulty of adding user-space support is 
+that you need to create a new virtual address space, have an executable 
+loader (that might start the executable file directly, or might start a 
+"user-space executable loader" that starts the executable file), create a
+ new "first task for process" that includes a user-space stack, etc. I 
+prefer to create a kernel task first and then do all this other work (to
+ set up a process) while using the kernel task, because this works a lot
+ better with task priorities (e.g. if a very high priority task creates a
+ very low priority process, then most of the work needed to set up the 
+low priority process is done by a low priority task, and the high 
+priority task can continue without waiting for all that work).
+</p><p>Note: There are two common ways that processes can be started - 
+spawning a new process from nothing, and "fork()". Forking is horribly 
+inefficient and far more complicated (as you need to clone an existing 
+process, typically including making all of the existing process' pages 
+"copy on write", and then reversing all the work very soon after when 
+the new child process calls "exec()"). For beginners I recommend not 
+having "fork()" and just implementing a "spawn_process()" (and for 
+people who are not beginners I recommend not having "fork()" because 
+it's awful and has a risk of security problems - e.g. malicious code 
+using "fork()" and then having its own implementation of "exec()" 
+designed to inject malware into the new child process).
+</p><p>Once you have the ability to start a new process (including 
+starting an initial task/thread for that process), adding a way to spawn
+ a new task/thread for an existing process should be easy.
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Adding_FPU.2FMMX.2FSSE.2FAVX_Support_.2880x86_only.29">Adding FPU/MMX/SSE/AVX Support (80x86 only)</span></h2>
+<p>Originally (80386, single-CPU) Intel designed protected mode so that 
+an OS can avoid saving/loading FPU state during task switches. The 
+general idea was to keep track of an "FPU owner" and use a flag ("TS" in
+ EFLAGS) to indicate when the currently running task isn't the FPU 
+owner. If the CPU executes an instruction that uses FPU but the current 
+task isn't the FPU owner, then the CPU raises an exception (because "TS"
+ is set), and the exception handler saves the FPU state (belonging to a 
+different task) and loads the FPU state for the currently running task. 
+This can (in some cases) improve performance a lot - for example, if you
+ have 100 tasks running where only one uses FPU, you'd never need to 
+save or load FPU state. Intel continued this original idea when newer 
+extensions (MMX, SSE, AVX) where added (although for AVX the 
+implementation is significantly different).
+</p><p>However; when almost all tasks are using FPU/MMX/SSE/AVX state, 
+it makes performance worse (due to the extra cost of an inevitable 
+exception); and it doesn't work well for multi-CPU (where the currently 
+running task's FPU state may still be in a completely different CPU).
+</p><p>The simplest solution is to always save and load FPU/MMX/SSE/AVX 
+state during all task switches (and that would be a recommended starting
+ point). There are also multiple more complex (and more efficient) ways 
+of doing it; including always saving the previous task's FPU/MMX/SSE/AVX
+ state during task switches if you know it was used but still postponing
+ the work of load the next task's state until the task actually does 
+need it; and including keeping track of "never used, sometimes used, 
+always used" and pre-loading the FPU/MMX/SSE/AVX state when you know a 
+task always uses it (or uses it often enough).
+</p>
+<!-- 
+NewPP limit report
+Preprocessor node count: 351/1000000
+Post-expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key wikidb:pcache:idhash:4285-0!*!*!!en!*!* and timestamp 20191103160108 -->
+</div>				<!-- /bodycontent -->
+								<!-- printfooter -->
+				<div class="printfooter">
+				Retrieved from "<a href="https://wiki.osdev.org/index.php?title=Brendan%27s_Multi-tasking_Tutorial&amp;oldid=24039">https://wiki.osdev.org/index.php?title=Brendan%27s_Multi-tasking_Tutorial&amp;oldid=24039</a>"				</div>
+				<!-- /printfooter -->
+												<!-- catlinks -->
+				<div id="catlinks" class="catlinks catlinks-allhidden"></div>				<!-- /catlinks -->
+												<div class="visualClear"></div>
+				<!-- debughtml -->
+								<!-- /debughtml -->
+			</div>
+			<!-- /bodyContent -->
+		</div>
+		<!-- /content -->
+		<!-- header -->
+		<div id="mw-head" class="noprint">
+			
+<!-- 0 -->
+<div id="p-personal" class="">
+	<h5>Personal tools</h5>
+	<ul>
+		<li id="pt-login"><a href="https://wiki.osdev.org/index.php?title=Special:UserLogin&amp;returnto=Brendan%27s_Multi-tasking_Tutorial" title="You are encouraged to log in; however, it is not mandatory [alt-shift-o]" accesskey="o">Log in</a></li>
+	</ul>
+</div>
+
+<!-- /0 -->
+			<div id="left-navigation">
+				
+<!-- 0 -->
+<div id="p-namespaces" class="vectorTabs">
+	<h5>Namespaces</h5>
+	<ul>
+					<li id="ca-nstab-main" class="selected"><span><a href="https://wiki.osdev.org/Brendan%27s_Multi-tasking_Tutorial" title="View the content page [alt-shift-c]" accesskey="c">Page</a></span></li>
+					<li id="ca-talk" class="new"><span><a href="https://wiki.osdev.org/index.php?title=Talk:Brendan%27s_Multi-tasking_Tutorial&amp;action=edit&amp;redlink=1" title="Discussion about the content page [alt-shift-t]" accesskey="t">Discussion</a></span></li>
+			</ul>
+</div>
+
+<!-- /0 -->
+
+<!-- 1 -->
+<div id="p-variants" class="vectorMenu emptyPortlet">
+		<h5><span>Variants</span><a href="#"></a></h5>
+	<div class="menu">
+		<ul>
+					</ul>
+	</div>
+</div>
+
+<!-- /1 -->
+			</div>
+			<div id="right-navigation">
+				
+<!-- 0 -->
+<div id="p-views" class="vectorTabs">
+	<h5>Views</h5>
+	<ul>
+					<li id="ca-view" class="selected"><span><a href="https://wiki.osdev.org/Brendan%27s_Multi-tasking_Tutorial">Read</a></span></li>
+					<li id="ca-viewsource"><span><a href="https://wiki.osdev.org/index.php?title=Brendan%27s_Multi-tasking_Tutorial&amp;action=edit" title="This page is protected.
+You can view its source [alt-shift-e]" accesskey="e">View source</a></span></li>
+					<li id="ca-history" class="collapsible"><span><a href="https://wiki.osdev.org/index.php?title=Brendan%27s_Multi-tasking_Tutorial&amp;action=history" title="Past revisions of this page [alt-shift-h]" accesskey="h">View history</a></span></li>
+			</ul>
+</div>
+
+<!-- /0 -->
+
+<!-- 1 -->
+<div id="p-cactions" class="vectorMenu emptyPortlet">
+	<h5><span>Actions</span><a href="#"></a></h5>
+	<div class="menu">
+		<ul>
+					</ul>
+	</div>
+</div>
+
+<!-- /1 -->
+
+<!-- 2 -->
+<div id="p-search">
+	<h5><label for="searchInput">Search</label></h5>
+	<form action="/index.php" id="searchform">
+		<input type="hidden" name="title" value="Special:Search">
+				<input type="search" name="search" title="Search OSDev Wiki [alt-shift-f]" accesskey="f" id="searchInput">		<input type="submit" name="go" value="Go" title="Go to a page with this exact name if exists" id="searchGoButton" class="searchButton">		<input type="submit" name="fulltext" value="Search" title="Search the pages for this text" id="mw-searchButton" class="searchButton">			</form>
+</div>
+
+<!-- /2 -->
+			</div>
+		</div>
+		<!-- /header -->
+		<!-- panel -->
+			<div id="mw-panel" class="noprint">
+				<!-- logo -->
+					<div id="p-logo"><a style="background-image: url(/skins/common/images/osdev.png);" href="https://wiki.osdev.org/Main_Page" title="Visit the main page"></a></div>
+				<!-- /logo -->
+				
+<!-- navigation -->
+<div class="portal" id="p-navigation">
+	<h5>Navigation</h5>
+	<div class="body">
+		<ul>
+			<li id="n-mainpage"><a href="https://wiki.osdev.org/Main_Page" title="Visit the main page [alt-shift-z]" accesskey="z">Main Page</a></li>
+			<li id="n-portal"><a href="http://forum.osdev.org/" rel="nofollow" title="About the project, what you can do, where to find things">Forums</a></li>
+			<li id="n-FAQ"><a href="https://wiki.osdev.org/Category:FAQ">FAQ</a></li>
+			<li id="n-OS-Projects"><a href="https://wiki.osdev.org/Projects">OS Projects</a></li>
+			<li id="n-randompage"><a href="https://wiki.osdev.org/Special:Random" title="Load a random page [alt-shift-x]" accesskey="x">Random page</a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- /navigation -->
+
+<!-- about -->
+<div class="portal" id="p-about">
+	<h5>About</h5>
+	<div class="body">
+		<ul>
+			<li id="n-This-site"><a href="https://wiki.osdev.org/OSDevWiki:About">This site</a></li>
+			<li id="n-Joining"><a href="https://wiki.osdev.org/OSDevWiki:Joining">Joining</a></li>
+			<li id="n-Editing-help"><a href="https://wiki.osdev.org/OSDevWiki:Editing">Editing help</a></li>
+			<li id="n-recentchanges"><a href="https://wiki.osdev.org/Special:RecentChanges" title="A list of recent changes in the wiki [alt-shift-r]" accesskey="r">Recent changes</a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- /about -->
+
+<!-- SEARCH -->
+
+<!-- /SEARCH -->
+
+<!-- TOOLBOX -->
+<div class="portal" id="p-tb">
+	<h5>Toolbox</h5>
+	<div class="body">
+		<ul>
+			<li id="t-whatlinkshere"><a href="https://wiki.osdev.org/Special:WhatLinksHere/Brendan%27s_Multi-tasking_Tutorial" title="A list of all wiki pages that link here [alt-shift-j]" accesskey="j">What links here</a></li>
+			<li id="t-recentchangeslinked"><a href="https://wiki.osdev.org/Special:RecentChangesLinked/Brendan%27s_Multi-tasking_Tutorial" title="Recent changes in pages linked from this page [alt-shift-k]" accesskey="k">Related changes</a></li>
+			<li id="t-specialpages"><a href="https://wiki.osdev.org/Special:SpecialPages" title="A list of all special pages [alt-shift-q]" accesskey="q">Special pages</a></li>
+			<li><a href="https://wiki.osdev.org/index.php?title=Brendan%27s_Multi-tasking_Tutorial&amp;printable=yes" rel="alternate">Printable version</a></li>
+			<li id="t-permalink"><a href="https://wiki.osdev.org/index.php?title=Brendan%27s_Multi-tasking_Tutorial&amp;oldid=24039" title="Permanent link to this revision of the page">Permanent link</a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- /TOOLBOX -->
+
+<!-- LANGUAGES -->
+
+<!-- /LANGUAGES -->
+			</div>
+		<!-- /panel -->
+		<!-- footer -->
+		<div id="footer">
+							<ul id="footer-info">
+											<li id="footer-info-lastmod"> This page was last modified on 5 October 2019, at 13:23.</li>
+											<li id="footer-info-viewcount">This page has been accessed 3,921 times.</li>
+									</ul>
+							<ul id="footer-places">
+											<li id="footer-places-privacy"><a href="https://wiki.osdev.org/OSDev_Wiki:Privacy_policy" title="OSDev Wiki:Privacy policy">Privacy policy</a></li>
+											<li id="footer-places-about"><a href="https://wiki.osdev.org/OSDev_Wiki:About" title="OSDev Wiki:About">About OSDev Wiki</a></li>
+											<li id="footer-places-disclaimer"><a href="https://wiki.osdev.org/OSDev_Wiki:General_disclaimer" title="OSDev Wiki:General disclaimer">Disclaimers</a></li>
+									</ul>
+										<ul id="footer-icons" class="noprint">
+					<li id="footer-poweredbyico">
+						<a href="http://www.mediawiki.org/"><img src="Brendan's%20Multi-tasking%20Tutorial%20-%20OSDev%20Wiki_files/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" width="88" height="31"></a>
+					</li>
+				</ul>
+						<div style="clear:both"></div>
+		</div>
+		<!-- /footer -->
+		<!-- fixalpha -->
+		<script type="text/javascript"> if ( window.isMSIE55 ) fixalpha(); </script>
+		<!-- /fixalpha -->
+		<script src="Brendan's%20Multi-tasking%20Tutorial%20-%20OSDev%20Wiki_files/load_003.php"></script>
+<script>if(window.mw){
+	mw.loader.load(["mediawiki.user", "mediawiki.util", "mediawiki.page.ready", "mediawiki.legacy.wikibits", "mediawiki.legacy.ajax"]);
+}
+</script><script type="text/javascript" src="Brendan's%20Multi-tasking%20Tutorial%20-%20OSDev%20Wiki_files/load_005.php"></script>
+<script src="Brendan's%20Multi-tasking%20Tutorial%20-%20OSDev%20Wiki_files/load_002.php"></script>
+<script>if(window.mw){
+	mw.user.options.set({"ccmeonemails":0,"cols":80,"date":"default","diffonly":0,"disablemail":0,"disablesuggest":0,"editfont":"default","editondblclick":0,"editsection":1,"editsectiononrightclick":0,"enotifminoredits":0,"enotifrevealaddr":0,"enotifusertalkpages":1,"enotifwatchlistpages":0,"extendwatchlist":0,"externaldiff":0,"externaleditor":0,"fancysig":0,"forceeditsummary":0,"gender":"unknown","hideminor":0,"hidepatrolled":0,"highlightbroken":1,"imagesize":2,"justify":0,"math":1,"minordefault":0,"newpageshidepatrolled":0,"nocache":0,"noconvertlink":0,"norollbackdiff":0,"numberheadings":0,"previewonfirst":0,"previewontop":1,"quickbar":5,"rcdays":7,"rclimit":50,"rememberpassword":0,"rows":25,"searchlimit":20,"showhiddencats":0,"showjumplinks":1,"shownumberswatching":1,"showtoc":1,"showtoolbar":1,"skin":"vector","stubthreshold":0,"thumbsize":2,"underline":2,"uselivepreview":0,"usenewrc":0,"watchcreations":0,"watchdefault":0,"watchdeletion":0,"watchlistdays":3,"watchlisthideanons":0,
+	"watchlisthidebots":0,"watchlisthideliu":0,"watchlisthideminor":0,"watchlisthideown":0,"watchlisthidepatrolled":0,"watchmoves":0,"wllimit":250,"variant":"en","language":"en","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"searchNs8":false,"searchNs9":false,"searchNs10":false,"searchNs11":false,"searchNs12":false,"searchNs13":false,"searchNs14":false,"searchNs15":false});;mw.user.tokens.set({"editToken":"+\\","watchToken":false});;mw.loader.state({"user.options":"ready","user.tokens":"ready"});
+	
+	/* cache key: wikidb:resourceloader:filter:minify-js:4:19a4b18a9ac79a6b8c60b24af4668814 */
+}
+</script><!-- Served in 0.030 secs. -->
+	
+
+</body></html>

@@ -13,11 +13,13 @@
 //  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
 //  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
 //  2019-Nov-01  Step 8   step08   ADCL  Add checks for postponed task changes
+//  2019-Nov-05  Step 9   step08   ADCL  Add sleeping to the process repetoire
 //
 //===================================================================================================================
 
 
 #include "cpu.h"
+#include "video.h"
 #include "scheduler.h"
 
 
@@ -58,6 +60,13 @@ PCB_t *readyListTail;
 
 
 //
+// -- The list of sleeping tasks
+//    --------------------------
+PCB_t *sleepingListHead;
+PCB_t *sleepingListTail;
+
+
+//
 // -- This is the array of possible running tasks
 //    -------------------------------------------
 PCB_t pcbArray[MAX_TASKS];
@@ -86,6 +95,9 @@ void InitScheduler(void)
 
     readyListHead = (PCB_t *)0;
     readyListTail = (PCB_t *)0;
+
+    sleepingListHead = (PCB_t *)0;
+    sleepingListTail = (PCB_t *)0;
 
     lastCounter = GetCurrentCounter();
 }
@@ -124,7 +136,7 @@ void PcbFree(PCB_t *pcb)
 //    ---------------------------------------------------------------------------
 static void ProcessStartup(void) 
 {
-    UnlockScheduler();
+    UnlockAndSchedule();
 }
 
 
@@ -173,8 +185,8 @@ PCB_t *CreateProcess(void (*ent)())
     if (!rv) return rv;
 
     unsigned int *tos = (unsigned int *)rv->tos;
-    PUSH(tos, (unsigned int)ProcessStartup);  // startup function
     PUSH(tos, (unsigned int)ent);        // entry point
+    PUSH(tos, (unsigned int)ProcessStartup);  // startup function
     PUSH(tos, 0);           // EBP
     PUSH(tos, 0);           // EDI
     PUSH(tos, 0);           // ESI
@@ -182,10 +194,11 @@ PCB_t *CreateProcess(void (*ent)())
 
     rv->tos = (unsigned int)tos;
     rv->virtAddr = GetCR3();
+    rv->sleepUntil = (unsigned long)-1;
 
-    LockScheduler();
+    LockAndPostpone();
     AddReady(rv);
-    UnlockScheduler();
+    UnlockAndSchedule();
 
     return rv;
 }
@@ -278,10 +291,10 @@ void UnlockAndSchedule(void)
 //    -------------------------
 void BlockProcess(int reason)
 {
-    LockScheduler();
+    LockAndPostpone();
     currentPCB->state = reason;
     Schedule();
-    UnlockScheduler();
+    UnlockAndSchedule();
 }
 
 
@@ -290,15 +303,74 @@ void BlockProcess(int reason)
 //    -----------------
 void UnblockProcess(PCB_t *proc) 
 {
-    LockScheduler();
-
-    if (readyListHead == (PCB_t *)0) {
-        SwitchToTask(proc);
-    } else {
-        AddReady(proc);
-    }
-
-    UnlockScheduler();
+    LockAndPostpone();
+    AddReady(proc);
+    UnlockAndSchedule();
 }
 
+
+//
+// -- Add a process to the list of sleeping tasks
+//    -------------------------------------------
+void AddSleeping(PCB_t *task)
+{
+    if (!task) return;
+
+    task->state = SLEEPING;
+
+    if (sleepingListHead == (PCB_t *)0) {
+        sleepingListHead = sleepingListTail = task;
+    } else {
+        sleepingListTail->next = task;
+        sleepingListTail = task;
+    }
+}
+
+
+//
+// -- Sleep until time has passed
+//    ---------------------------
+void SleepUntil(unsigned long when)
+{
+    LockAndPostpone();
+
+    if (when < GetCurrentCounter()) {
+        UnlockAndSchedule();
+        return;
+    }
+
+    currentPCB->sleepUntil = when;
+    AddSleeping(currentPCB);
+
+    UnlockAndSchedule();    // -- this is OK because the scheduler structures are in order; worst case 
+                            //    is a task change to itself.
+    BlockProcess(SLEEPING);
+}
+
+
+//
+// -- This is the timer handler -- called with every timer tick
+//    Schedule() must be postponed before calling this function
+//    ---------------------------------------------------------
+void IrqTimerHandler(void)
+{
+    counter ++;
+
+    PCB_t *oldSleeping = sleepingListHead;
+    PCB_t *work = oldSleeping;
+    sleepingListHead = sleepingListTail = (PCB_t *)0;
+
+    while (work != (PCB_t *)0) {
+        oldSleeping = work->next;
+        work->next = (PCB_t *)0;
+
+        if (work->sleepUntil <= counter) {
+            UnblockProcess(work);
+        } else {
+            AddSleeping(work);
+        }
+
+        work = oldSleeping;
+    }
+}
 

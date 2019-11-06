@@ -12,6 +12,7 @@
 //  2019-Oct-05  Step 4   step04   ADCL  Create a process state
 //  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
 //  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
+//  2019-Nov-05  Step 9   step08   ADCL  Add sleeping to the process repetoire
 //
 //===================================================================================================================
 
@@ -27,6 +28,7 @@ typedef enum {
     RUNNING = 0,
     READY = 1,
     PAUSED = 2,
+    SLEEPING = 3,
 } ProcessState_t;
 
 
@@ -40,6 +42,7 @@ typedef struct PCB_t {
     struct PCB_t *next;
     int state;
     int used;
+    unsigned long sleepUntil;
 } PCB_t;
 
 
@@ -78,12 +81,20 @@ extern "C"
     void InitScheduler(void);
     void LockScheduler(void); 
     void UnlockScheduler(void);
+    void LockAndPostpone(void);
+    void UnlockAndSchedule(void);
+
     void Schedule(void);
+    void IrqTimerHandler(void);
 
     PCB_t *CreateProcess(void (*ent)());
     void BlockProcess(int reason);
     void UnblockProcess(PCB_t *proc);
+
+    void SleepUntil(unsigned long when);
 }
+
+inline void Sleep(unsigned long millis) { SleepUntil(millis + GetCurrentCounter()); }
 
 #endif
 
