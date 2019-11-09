@@ -12,7 +12,8 @@
 //  2019-Oct-05  Step 4   step04   ADCL  Create a process state
 //  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
 //  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
-//  2019-Nov-05  Step 9   step08   ADCL  Add sleeping to the process repetoire
+//  2019-Nov-05  Step 9   step09   ADCL  Add sleeping to the process repetoire
+//  2019-Nov-09  Step10   step10   ADCL  Add idle CPU handling (and clean up the time used)
 //
 //===================================================================================================================
 
@@ -41,7 +42,7 @@ typedef struct PCB_t {
     unsigned int virtAddr;
     struct PCB_t *next;
     int state;
-    int used;
+    unsigned long used;
     unsigned long sleepUntil;
 } PCB_t;
 

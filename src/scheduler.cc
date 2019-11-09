@@ -13,7 +13,8 @@
 //  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
 //  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
 //  2019-Nov-01  Step 8   step08   ADCL  Add checks for postponed task changes
-//  2019-Nov-05  Step 9   step08   ADCL  Add sleeping to the process repetoire
+//  2019-Nov-05  Step 9   step09   ADCL  Add sleeping to the process repetoire
+//  2019-Nov-09  Step10   step10   ADCL  Add idle CPU handling 
 //
 //===================================================================================================================
 
@@ -33,6 +34,13 @@
 // -- The number of times IRQs have been disbled
 //    ------------------------------------------
 static int irqDisableCounter = 0;
+
+
+//
+// -- The time the CPU has been idle
+//    ------------------------------
+unsigned long idleCPUTime = 0;
+
 
 //
 // -- The number of times locks that would postpone task swaps have been obtained
@@ -221,6 +229,23 @@ void Schedule(void)
 
     if (next) {
         SwitchToTask(next);
+    } else if (currentPCB->state == RUNNING) {
+        return;
+    } else {
+        PCB_t *task = currentPCB;
+        currentPCB = (PCB_t *)0;
+//        unsigned long idleStartTime = GetCurrentCounter();
+
+        // -- wait for the timer to make something ready to run
+        do {
+            STI();
+            HLT();
+            CLI();
+            next = NextReady();
+        } while (next == (PCB_t *)0);
+
+        currentPCB = task;
+        if (next != currentPCB) SwitchToTask(next);
     }
 }
 
@@ -232,7 +257,12 @@ void UpdateTimeUsed(void)
 {
     unsigned long c = lastCounter;
     lastCounter = GetCurrentCounter();
-    currentPCB->used += (lastCounter - c);
+
+    if (currentPCB == (PCB_t *)0) {
+        idleCPUTime += (lastCounter - c);
+    } else {
+        currentPCB->used += (lastCounter - c);
+    }
 }
 
 
