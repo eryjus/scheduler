@@ -612,5 +612,26 @@ So, the problem happened to be in `UnblockProcess()` where it was attempting to 
 
 So, with this, I think I am ready to commit.
 
+### 2019-Nov-06
+
+So, I did commit the code.  However, it is important for me to note that I removed all calls to `LockScheduler()` and `UnlockScheduler()`.  Having spent some time debugging, I believe that this is correct -- there is no way to ensure that a `LockScheduler()` -> `Schedule()` sequence ends with `UnlockScheduler()` after the task swap.  I still believe that this would be appropriate since I will need to postpone task changes when the kernel holds a lock (note that this courtesy does not extend to user-space locks), the actual lock to obtain would be passed in as a reference.
+
+### 2019-Nov-07
+
+## Step 10
+
+So, now it is time to handle an idle CPU.  Brendan lays out 2 ways to handle this -- an idle task and the scheduler going to sleep.  The easiest implementation is the idle task.  And since this is a purpose-built test, easy is the order of business.  However, I am wondering if I would be missing something in this case by not doing the same thing I am having problems with.  
+
+In this case, I am compelled to duplicate the thing I am having problems with and that would be the scheduler going to sleep.
+
+### 2019-Nov-09
+
+Today I will be work on the code to handle an idle CPU.
+
+That was relatiely simple to do.  I did have some cleanup to do to build my test case properly.  However, the test works.
+
+
+
+
 
 

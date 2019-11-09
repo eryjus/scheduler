@@ -13,7 +13,8 @@
 //  2019-Oct-05  Step 4   step04   ADCL  Add a process state -- sanity check
 //  2019-Oct-24  Step 5   step05   ADCL  Add rudamentary scheduler lock
 //  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
-//  2019-Nov-05  Step 9   step08   ADCL  Add sleeping to the process repetoire
+//  2019-Nov-05  Step 9   step09   ADCL  Add sleeping to the process repetoire
+//  2019-Nov-09  Step10   step10   ADCL  Add idle CPU handling 
 //
 //===================================================================================================================
 
@@ -42,12 +43,10 @@ void Process(void)
 {
     char ch = pch ++;
     while (true) {
-        // -- sanity check for the state -- lower case is broken
-        if (currentPCB->state == RUNNING) WriteChar(ch);
-        else WriteChar(ch - 'A' + 'a');
+        WriteChar(ch);
         
         // -- sleep some number of ms to let other things process
-        Sleep((ch - 'A') * 15);
+        Sleep((ch - 'A' + 1) * 1500);
     }
 }
 
@@ -79,9 +78,5 @@ void kMain(void)
     CreateProcess(Process);
     CreateProcess(Process);
 
-    while(1) {
-        LockAndPostpone();
-        Schedule();
-        UnlockAndSchedule();
-    }
+    Process();
 }
