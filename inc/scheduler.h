@@ -14,6 +14,7 @@
 //  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
 //  2019-Nov-05  Step 9   step09   ADCL  Add sleeping to the process repetoire
 //  2019-Nov-09  Step10   step10   ADCL  Add idle CPU handling (and clean up the time used)
+//  2019-Nov-10  Step11   step11   ADCL  Add preemption
 //
 //===================================================================================================================
 
@@ -44,6 +45,7 @@ typedef struct PCB_t {
     int state;
     unsigned long used;
     unsigned long sleepUntil;
+    int quantumLeft;
 } PCB_t;
 
 

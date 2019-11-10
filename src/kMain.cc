@@ -15,6 +15,7 @@
 //  2019-Oct-25  Step 6   step06   ADCL  Add the ability to block/unblock
 //  2019-Nov-05  Step 9   step09   ADCL  Add sleeping to the process repetoire
 //  2019-Nov-09  Step10   step10   ADCL  Add idle CPU handling 
+//  2019-Nov-10  Step11   step11   ADCL  Add preemption
 //
 //===================================================================================================================
 
@@ -44,9 +45,6 @@ void Process(void)
     char ch = pch ++;
     while (true) {
         WriteChar(ch);
-        
-        // -- sleep some number of ms to let other things process
-        Sleep((ch - 'A' + 1) * 1500);
     }
 }
 

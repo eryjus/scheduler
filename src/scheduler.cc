@@ -15,6 +15,7 @@
 //  2019-Nov-01  Step 8   step08   ADCL  Add checks for postponed task changes
 //  2019-Nov-05  Step 9   step09   ADCL  Add sleeping to the process repetoire
 //  2019-Nov-09  Step10   step10   ADCL  Add idle CPU handling 
+//  2019-Nov-10  Step11   step11   ADCL  Add preemption
 //
 //===================================================================================================================
 
@@ -28,6 +29,12 @@
 // -- PUSH a value on the stack for a new process
 //    -------------------------------------------
 #define PUSH(tos,val) (*(-- tos) = val)
+
+
+//
+// -- This is the timeslice allowed befre preemption
+//    ----------------------------------------------
+#define TIMESLICE   1
 
 
 //
@@ -98,6 +105,7 @@ void InitScheduler(void)
     pcbArray[0].virtAddr = GetCR3();
     pcbArray[0].state = RUNNING;
     pcbArray[0].next = (PCB_t *)0;
+    pcbArray[0].quantumLeft = 0;
 
     currentPCB = &pcbArray[0];
 
@@ -203,6 +211,7 @@ PCB_t *CreateProcess(void (*ent)())
     rv->tos = (unsigned int)tos;
     rv->virtAddr = GetCR3();
     rv->sleepUntil = (unsigned long)-1;
+    rv->quantumLeft = 0;
 
     LockAndPostpone();
     AddReady(rv);
@@ -228,6 +237,7 @@ void Schedule(void)
     PCB_t *next = NextReady();
 
     if (next) {
+        next->quantumLeft = TIMESLICE;
         SwitchToTask(next);
     } else if (currentPCB->state == RUNNING) {
         return;
@@ -245,6 +255,7 @@ void Schedule(void)
         } while (next == (PCB_t *)0);
 
         currentPCB = task;
+        task->quantumLeft = TIMESLICE;
         if (next != currentPCB) SwitchToTask(next);
     }
 }
@@ -401,6 +412,14 @@ void IrqTimerHandler(void)
         }
 
         work = oldSleeping;
+    }
+
+    if (currentPCB) {
+        currentPCB->quantumLeft --;
+
+        if (currentPCB->quantumLeft <= 0) {
+            Schedule();
+        }
     }
 }
 
