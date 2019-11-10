@@ -618,7 +618,7 @@ So, I did commit the code.  However, it is important for me to note that I remov
 
 ### 2019-Nov-07
 
-## Step 10
+## Branch `step10`
 
 So, now it is time to handle an idle CPU.  Brendan lays out 2 ways to handle this -- an idle task and the scheduler going to sleep.  The easiest implementation is the idle task.  And since this is a purpose-built test, easy is the order of business.  However, I am wondering if I would be missing something in this case by not doing the same thing I am having problems with.  
 
@@ -629,6 +629,10 @@ In this case, I am compelled to duplicate the thing I am having problems with an
 Today I will be work on the code to handle an idle CPU.
 
 That was relatiely simple to do.  I did have some cleanup to do to build my test case properly.  However, the test works.
+
+## Branch `step11`
+
+This step puts in preemption, where a process is allocated a little bit of time before the CPU is taken from the running process and given to another waiting process.  The biggest problem I am going to have is the size of the timeslice since I am at 1ms granularity.
 
 
 
