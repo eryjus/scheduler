@@ -16,6 +16,7 @@
 //  2019-Nov-05  Step 9   step09   ADCL  Add sleeping to the process repetoire
 //  2019-Nov-09  Step10   step10   ADCL  Add idle CPU handling 
 //  2019-Nov-10  Step11   step11   ADCL  Add preemption
+//  2019-Nov-20  Step12   step12   ADCL  Add process termination
 //
 //===================================================================================================================
 
@@ -40,7 +41,7 @@
 //
 // -- The number of times IRQs have been disbled
 //    ------------------------------------------
-static int irqDisableCounter = 0;
+static volatile int irqDisableCounter = 0;
 
 
 //
@@ -52,7 +53,7 @@ unsigned long idleCPUTime = 0;
 //
 // -- The number of times locks that would postpone task swaps have been obtained
 //    ---------------------------------------------------------------------------
-int postponeTaskCounter = 0;
+volatile int postponeTaskCounter = 0;
 
 
 //
@@ -82,6 +83,19 @@ PCB_t *sleepingListTail;
 
 
 //
+// -- The list of terminated tasks
+//    ----------------------------
+PCB_t *terminatedListHead;
+PCB_t *terminatedListTail;
+
+
+//
+// -- The Butler task
+//    ---------------
+PCB_t *butler;
+
+
+//
 // -- This is the array of possible running tasks
 //    -------------------------------------------
 PCB_t pcbArray[MAX_TASKS];
@@ -108,12 +122,16 @@ void InitScheduler(void)
     pcbArray[0].quantumLeft = 0;
 
     currentPCB = &pcbArray[0];
+    butler = currentPCB;
 
     readyListHead = (PCB_t *)0;
     readyListTail = (PCB_t *)0;
 
     sleepingListHead = (PCB_t *)0;
     sleepingListTail = (PCB_t *)0;
+
+    terminatedListHead = (PCB_t *)0;
+    terminatedListTail = (PCB_t *)0;
 
     lastCounter = GetCurrentCounter();
 }
@@ -152,7 +170,7 @@ void PcbFree(PCB_t *pcb)
 //    ---------------------------------------------------------------------------
 static void ProcessStartup(void) 
 {
-    UnlockAndSchedule();
+    UnlockScheduler();
 }
 
 
@@ -164,6 +182,7 @@ void AddReady(PCB_t *task)
     if (!task) return;
 
     task->state = READY;
+    task->next = (PCB_t *)0;            // should already be null, but just in case
 
     if (readyListHead == (PCB_t *)0) {
         readyListHead = readyListTail = task;
@@ -187,6 +206,7 @@ PCB_t *NextReady(void)
 
     if (readyListHead == (PCB_t *)0) readyListTail = readyListHead;
 
+    rv->next = (PCB_t *)0;
     return rv;
 }
 
@@ -244,7 +264,6 @@ void Schedule(void)
     } else {
         PCB_t *task = currentPCB;
         currentPCB = (PCB_t *)0;
-//        unsigned long idleStartTime = GetCurrentCounter();
 
         // -- wait for the timer to make something ready to run
         do {
@@ -255,8 +274,10 @@ void Schedule(void)
         } while (next == (PCB_t *)0);
 
         currentPCB = task;
-        task->quantumLeft = TIMESLICE;
-        if (next != currentPCB) SwitchToTask(next);
+        next->quantumLeft = TIMESLICE;
+        if (next != currentPCB) {
+            SwitchToTask(next);
+        }
     }
 }
 
@@ -302,8 +323,7 @@ void UnlockScheduler(void)
 //    --------------------------------------------------------
 void LockAndPostpone(void) 
 {
-    CLI();
-    irqDisableCounter ++;
+    LockScheduler();
     postponeTaskCounter ++;
 }
 
@@ -321,8 +341,7 @@ void UnlockAndSchedule(void)
         }
     }
 
-    irqDisableCounter --;
-    if (irqDisableCounter == 0) STI();
+    UnlockScheduler();
 }
 
 
@@ -420,6 +439,62 @@ void IrqTimerHandler(void)
         if (currentPCB->quantumLeft <= 0) {
             Schedule();
         }
+    }
+}
+
+
+//
+// -- Add a process to the list of terminated tasks
+//    ---------------------------------------------
+void AddTerminated(PCB_t *task)
+{
+    if (!task) return;
+
+    task->state = SLEEPING;
+
+    if (terminatedListHead == (PCB_t *)0) {
+        terminatedListHead = terminatedListTail = task;
+    } else {
+        terminatedListTail->next = task;
+        terminatedListTail = task;
+    }
+}
+
+
+//
+// -- Terminate a task
+//    ----------------
+void TerminateProcess(void)
+{
+    LockAndPostpone();
+    AddTerminated(currentPCB);
+    BlockProcess(TERMINATED);       // process changes postponed
+    UnblockProcess(butler);
+
+    UnlockAndSchedule();            // The last thing executed as this process
+}
+
+
+//
+// -- Perform the Butler Responsibilities
+//    -----------------------------------
+void PerformButler(void)
+{
+    while (true) {
+        LockAndPostpone();
+        if (terminatedListHead == (PCB_t *)0) {
+            BlockProcess(PAUSED);
+            UnlockAndSchedule();
+            continue;
+        }
+
+        PCB_t *work = terminatedListHead;
+        terminatedListHead = terminatedListHead->next;
+        if (terminatedListHead == (PCB_t *)0) terminatedListTail = terminatedListHead;
+
+        PcbFree(work);
+
+        UnlockAndSchedule();
     }
 }
 

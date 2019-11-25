@@ -634,8 +634,90 @@ That was relatiely simple to do.  I did have some cleanup to do to build my test
 
 This step puts in preemption, where a process is allocated a little bit of time before the CPU is taken from the running process and given to another waiting process.  The biggest problem I am going to have is the size of the timeslice since I am at 1ms granularity.
 
+### 2019-Nov-20
 
+## Branch `step12`
 
+This last step is to terminate a process.  This involves having a process responsible for cleaning up after terminated processes and a queue to keep them on.  This also turned out to be relatively easy to implement.
 
+### 2019-Nov-24
 
+I am having a very similar problem with this code as I did with [Century-OS](https://github.com/eryjus/century-os), which is what brought me to building this purpose-built test.  In short, I am getting my interrupt controls and my step scheduling counters out of sync.  What I end up with is a string of characters on the screen which looks like this:
 
+```
+Welcome
++1,1*-0,%+1,1-0,0+1,1-0,0+1,1-0,0?+1,1+2,2v-1,1;+0,%-/,0+1,0*%-/,0B+1,0-/,0+1,0%-/,0C+1,0-/0+1,0
+```
+
+... which remains out-of-sync.  What do I mean by that?  Well, portions like `+1,0` should have the same value, either `0,0` or `1,1`.
+
+So, let's pull this apart a bit to determine what is going on.
+
+* `+1,1` -- from `LockAndPostpone()`, the counter of the `irqDisableCounter` and `postponeTaskCounter` after getting the lock
+* `*` -- from the `IrqTimerHandler`, indicating that the previous call was from the timer
+* `-0,` -- from `UnlockAndSchedule()`, the counter of the `postponeTaskCounter` after releasing releasing the lock; the value `0` indicates that we may be calling `Schedule()` if a task change was postponed
+* `%` -- from `Schedule()`, indicating that we are attempting to find a new process to run; there is no gurantee that a new process takes over
+
+It dawns on me that the compler may be fighting me on this.  Did I make the `irqDisableCounter` and `postponeTaskCounter` variables volatile?
+
+And, my problem ended up being in the `ProcessStartup()` function, where I was calling `UnlockAndSchedule()` rather than `UnlockScheduler()`:
+
+```C++
+static void ProcessStartup(void) 
+{
+//    UnlockAndSchedule();
+    UnlockScheduler();
+}
+```
+
+This was putting me out of sync.
+
+So, this deserves a bit of conversation.  The function that handles unlocking and performing a postponed process change looks like this:
+
+```C++
+//
+// -- Unlock a lock (global for now) and perform a Schedule if we can
+//    ---------------------------------------------------------------
+void UnlockAndSchedule(void)
+{
+    postponeTaskCounter --;
+    if (postponeTaskCounter == 0) {
+        if (taskChangePostponedFlag) {
+            taskChangePostponedFlag = false;
+            Schedule();
+        }
+    }
+
+    irqDisableCounter --;
+    if (irqDisableCounter == 0) STI();
+}
+```
+
+At the point in time that `Schedule()` is called, the `postponeTaskCounter` variable has already been maintained.  This means that when a newly created process will get control for the first time, it cannot also try to update `postponeTaskCounter`.  It really can only be concerned with `irqDisableCounter`.  Therefore the `ProcessStartup()` funtion needs to only look like this:
+
+```C++
+//
+// -- Process startup function which will be called before the actual entry point
+//    ---------------------------------------------------------------------------
+static void ProcessStartup(void) 
+{
+    UnlockScheduler();
+}
+```
+
+The difference in `UnlockScheduler()` is only to perform the task for unlocking the scheduler, such as:
+
+```C++
+//
+// -- Unlock the scheduler
+//    --------------------
+void UnlockScheduler(void)
+{
+    irqDisableCounter --;
+    if (irqDisableCounter == 0) STI();
+}
+```
+
+I should also note that the second half of `UnlockAndSchedule()` probably should be a call to `UnlockScheduler()` to be perfectly correct.  I will make that change.
+
+This, then, puts me in a position to commit this but of code.

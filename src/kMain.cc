@@ -16,6 +16,7 @@
 //  2019-Nov-05  Step 9   step09   ADCL  Add sleeping to the process repetoire
 //  2019-Nov-09  Step10   step10   ADCL  Add idle CPU handling 
 //  2019-Nov-10  Step11   step11   ADCL  Add preemption
+//  2019-Nov-20  Step12   step12   ADCL  Add process termination
 //
 //===================================================================================================================
 
@@ -45,6 +46,13 @@ void Process(void)
     char ch = pch ++;
     while (true) {
         WriteChar(ch);
+        Sleep(500 + (ch * 100));
+
+        if ((ch % 2) == 0) {
+            WriteChar(ch);
+            WriteChar('!');
+            TerminateProcess();
+        }
     }
 }
 
@@ -76,5 +84,8 @@ void kMain(void)
     CreateProcess(Process);
     CreateProcess(Process);
 
-    Process();
+    //
+    // -- assume the butler responsibilties
+    //    ---------------------------------
+    PerformButler();
 }
